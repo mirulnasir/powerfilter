@@ -1,6 +1,6 @@
 # Trustana FE Take home assignment (Senior)
 
-Please read the following instructions carefully first.
+PLEASE READ the following instructions carefully first.
 
 ## Instructions
 
@@ -58,3 +58,7 @@ Feel free to use any AI tools to help you with the assignment. However, you will
 3. I have some questions related to the user experience and the UI.
 
 - If you cannot get answers to your questions in time, please state your assumptions, continue with the assignment and include it under the section "Assumptions" in your README.md.
+
+4. Can I design the UI however I want? Can I include any additional features?
+
+- Yes, go crazy, go wild, we love surprises.
