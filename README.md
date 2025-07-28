@@ -6,10 +6,9 @@ PLEASE READ the following instructions carefully first.
 
 1. Clone the repository to your local machine.
 2. Create a SUBMISSION.md file in the root of the repository. This SUBMISSION.md will be the file where you will describe your solution, issues, assumptions and other information.
-3. You can use any AI tools to help you with the assignment.
-4. If the data provided has incorrect or missing information, please fix it as you deem fit and include it under the section "Fixes" in your README.md.
-5. If you made any assumptions, please include them under the section "Assumptions" in your README.md.
-6. You can install any additional dependencies you may need, but you will need to explain your decisions in the SUBMISSION.md file.
+3. If the data provided has incorrect or missing information, please fix it as you deem fit and include it under the section "Fixes" in your README.md.
+4. If you made any assumptions, please include them under the section "Assumptions" in your README.md.
+5. You can install any additional dependencies you may need, but you will need to explain your decisions in the SUBMISSION.md file.
 
 ## Introduction
 
@@ -30,14 +29,14 @@ You have a list of mock apis that you can use to get the data you need. As these
 2. You must use React.
 3. You must use Next.js + App router
 4. You must use the provided mock APIs.
-5. You must use the provided types.
-6. You must use the provided enums.
+5. You must use the provided types, if you need to edit them, please include it under the section "Fixes" in your README.md.
+6. You must use the provided enums, if you need to edit them, please include it under the section "Fixes" in your README.md.
 
 ### Product requirements
 
 - Fast render times
 - Shareable filters
-- Default page: 100
+- Default products per view: 100
 - Max attributes per supplier: 1,000
 - Expected products per supplier: 10,000 - 300,000
 
