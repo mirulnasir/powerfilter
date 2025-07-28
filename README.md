@@ -17,7 +17,7 @@ Trustana is a product data platform that enable retailers to transform and manip
 
 ### Your Task
 
-Your task is to create a web application that allows users to view, search and perform complex filters on product data. As a user, I want to quickly filter products, create custom views, save filters and share them with my team.
+Your task is to create a web application that allows users to view, search and perform complex filters on product data. As a user, I want to quickly filter product attributes, create custom views, save filters and share them with my team.
 
 You have a list of mock apis that you can use to get the data you need. As these are mock apis, you can skip the Create / Update / Delete operations.
 
@@ -38,7 +38,8 @@ You have a list of mock apis that you can use to get the data you need. As these
 - Fast render times
 - Shareable filters
 - Default page: 100
-- Max attribute per supplier: 100
+- Max attributes per supplier: 1,000
+- Expected products per supplier: 10,000 - 300,000
 
 ### Usage of AI
 
