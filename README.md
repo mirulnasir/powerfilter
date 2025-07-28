@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Trustana FE Take home assignment (Senior)
 
-## Getting Started
+Please read the following instructions carefully first.
 
-First, run the development server:
+## Instructions
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Clone the repository to your local machine.
+2. Create a SUBMISSION.md file in the root of the repository. This SUBMISSION.md will be the file where you will describe your solution, issues, assumptions and other information.
+3. You can use any AI tools to help you with the assignment.
+4. If the data provided has incorrect or missing information, please fix it as you deem fit and include it under the section "Fixes" in your README.md.
+5. If you made any assumptions, please include them under the section "Assumptions" in your README.md.
+6. You can install any additional dependencies you may need, but you will need to explain your decisions in the SUBMISSION.md file.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Introduction
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Trustana is a product data platform that enable retailers to transform and manipulate their product efficiently according to their needs.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Your Task
 
-## Learn More
+Your task is to create a web application that allows users to view, search and perform complex filters on product data. As a user, I want to quickly filter products, create custom views, save filters and share them with my team.
 
-To learn more about Next.js, take a look at the following resources:
+You have a list of mock apis that you can use to get the data you need. As these are mock apis, you can skip the Create / Update / Delete operations.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- /api/products
+- /api/attributes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Non-negotiables
 
-## Deploy on Vercel
+1. You must use TypeScript.
+2. You must use React.
+3. You must use Next.js + App router
+4. You must use the provided mock APIs.
+5. You must use the provided types.
+6. You must use the provided enums.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Product requirements
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Fast render times
+- Shareable filters
+- Default page: 100
+- Max attribute per supplier: 100
+
+### Usage of AI
+
+Feel free to use any AI tools to help you with the assignment. However, you will be expected to explain your solution during the followup interview.
+
+## FAQ
+
+1. Why are there weird fields present in the mock JSON but are not present in the types?
+
+- To simplify the assignment, we have removed some fields that are not relevant to the task, only focus on the fields that are present in the types provided.
+
+2. I think I found some issues with the mock data / apis provided.
+
+- Please fix the issues to the best of your ability and include it under the section "Fixes" in your README.md.
+
+3. I have some questions related to the user experience and the UI.
+
+- If you cannot get answers to your questions in time, please state your assumptions, continue with the assignment and include it under the section "Assumptions" in your README.md.
