@@ -60,8 +60,8 @@ const attributes = await fetch(`${baseUrl}/api/products`, {
 2. You must use React.
 3. You must use Next.js + App router
 4. You must use the provided mock APIs.
-5. You must use the provided types, if you need to edit them, please include it under the section "Fixes" in your README.md.
-6. You must use the provided enums, if you need to edit them, please include it under the section "Fixes" in your README.md.
+5. You must use the provided types.
+6. You must use the provided enums.
 
 ### Product requirements
 
@@ -79,6 +79,7 @@ Feel free to use any AI tools to help you with the assignment. However, you will
 
 1. Document your overall implementation, roadblocks, assumptions, issues and incomplete tasks if any in the submission.md file.
 2. Deployment to a hosted service provider is optional but greatly appreciated.
+3. Submit your repository link + the deployed link (If any)
 
 ## FAQ
 
