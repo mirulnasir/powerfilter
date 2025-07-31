@@ -18,7 +18,7 @@ Trustana is a product data platform that enable retailers to transform and manip
 
 Your task is to create a web application that allows users to view, search and perform complex filters on product data in a table style format. As a user, I want to quickly filter product attributes, create custom views, manipulate columns, save filters and share them with my team.
 
-You are provided a list of mock apis that you can use to get the data you need. As these are mock apis reading from static files, you can skip Create / Update / Delete operations. **HOWEVER, your web app must be designed with considerations of a complete CRUD application in mind.**
+You are provided a list of mock apis that you can use to get the data you need. As these are mock apis reading from static files, you can skip Create / Update / Delete operations. **HOWEVER, your frontend architecture must be designed with considerations of a complete CRUD application in mind.**
 
 (For simplicity, these are built into NextJS API router, please assume that they are backend apis)
 
@@ -63,11 +63,13 @@ const attributes = await fetch(`${baseUrl}/api/products`, {
 5. You must use the provided types.
 6. You must use the provided enums.
 7. Implement comprehensive error management
-   - Examples but not limited to: client error boundaries, error logging for debugging, etc.
-8. Implement observability
+   - Examples but not limited to: client error boundaries, error logging, etc.
+8. Implement observability and web vitals tracking
    - Examples but not limited to: Performance metrics, request tracing etc.
 9. Implement appropriate tool chains for codebase maintainability and quality
-   - Examples but not limited to: linting, commit patterns / message conventions, etc.
+   - Examples but not limited to: linting etc.
+10. Implement an E2E test for the filter functionality.
+11. Containerize your application.
 
 ### Product requirements
 
@@ -83,7 +85,7 @@ const attributes = await fetch(`${baseUrl}/api/products`, {
 ### Browser Support:
 
 - Modern browsers
-- Mobile responsive (tablet minimum)
+- Responsiveness - Desktop
 
 ### Usage of AI
 
