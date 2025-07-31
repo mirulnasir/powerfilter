@@ -18,7 +18,7 @@ Trustana is a product data platform that enable retailers to transform and manip
 
 Your task is to create a web application that allows users to view, search and perform complex filters on product data in a table style format. As a user, I want to quickly filter product attributes, create custom views, manipulate columns, save filters and share them with my team.
 
-You are provided a list of mock apis that you can use to get the data you need. As these are mock apis reading from static files, you can skip Create / Update / Delete operations.
+You are provided a list of mock apis that you can use to get the data you need. As these are mock apis reading from static files, you can skip Create / Update / Delete operations. **HOWEVER, your frontend architecture must be designed with considerations of a complete CRUD application in mind.**
 
 (For simplicity, these are built into NextJS API router, please assume that they are backend apis)
 
@@ -58,18 +58,34 @@ const attributes = await fetch(`${baseUrl}/api/products`, {
 
 1. You must use TypeScript.
 2. You must use React.
-3. You must use Next.js + App router
+3. You must use Next.js.
 4. You must use the provided mock APIs.
 5. You must use the provided types.
 6. You must use the provided enums.
+7. Implement comprehensive error management
+   - Examples but not limited to: client error boundaries, error logging, etc.
+8. Implement observability and web vitals tracking
+   - Examples but not limited to: Performance metrics, request tracing etc.
+9. Implement appropriate tool chains for codebase maintainability and quality
+   - Examples but not limited to: linting etc.
+10. Implement an E2E test for the filter functionality.
+11. Create Dockerfile for container based deployment.
 
 ### Product requirements
 
 - Fast render times (interpret this requirement as you see fit)
 - Shareable filters (interpret this requirement as you see fit)
 - Default products per view: 100
+
+### System constraints
+
 - Max attributes per supplier: 1,000
 - Expected products per supplier: 10,000 - 300,000
+
+### Browser Support:
+
+- Modern browsers
+- Responsiveness - Desktop
 
 ### Usage of AI
 
@@ -77,7 +93,7 @@ Feel free to use any AI tools to help you with the assignment. However, you will
 
 ## Submission
 
-1. Document your overall implementation, roadblocks, assumptions, issues and incomplete tasks if any in the submission.md file.
+1. Document tool / framework / library decisions and considerations, your overall roadblocks, assumptions, issues and incomplete tasks if any in the submission.md file.
 2. Deployment to a hosted service provider is optional but greatly appreciated.
 3. Submit your repository link + the deployed link (If any)
 
@@ -85,16 +101,15 @@ Feel free to use any AI tools to help you with the assignment. However, you will
 
 1. Why are there weird fields present in the mock JSON but are not present in the types?
 
-- To simplify the assignment, we have removed some fields that are not relevant to the task, only focus on the fields that are present in the types provided.
+   - To simplify the assignment, we have removed some fields that are not relevant to the task, only focus on the fields that are present in the types provided.
 
 2. I think I found some issues with the mock data / apis provided.
 
-- Please fix the issues to the best of your ability and include it under the section "Fixes" in your SUBMISSION.md.
+   - Please fix the issues to the best of your ability and include it under the section "Fixes" in your SUBMISSION.md.
 
 3. I have some questions related to the user experience and the UI.
 
-- If you cannot get answers to your questions in time, please state your assumptions, continue with the assignment and include it under the section "Assumptions" in your SUBMISSION.md.
+   - If you cannot get answers to your questions in time, please state your assumptions, continue with the assignment and include it under the section "Assumptions" in your SUBMISSION.md.
 
 4. Can I design the UI however I want? Can I include any additional features?
-
-- Yes, go crazy, go wild, we love surprises.
+   - Yes, go crazy, go wild, we love surprises.
