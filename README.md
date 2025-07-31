@@ -69,7 +69,7 @@ const attributes = await fetch(`${baseUrl}/api/products`, {
 9. Implement appropriate tool chains for codebase maintainability and quality
    - Examples but not limited to: linting etc.
 10. Implement an E2E test for the filter functionality.
-11. Containerize your application.
+11. Create Dockerfile for container based deployment.
 
 ### Product requirements
 
