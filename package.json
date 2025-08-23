@@ -10,7 +10,7 @@
     "lint": "pnpm run '/^lint:.*/'",
     "lint:eslint": "eslint --cache --cache-location 'node_modules/.cache/eslint/.eslintcache' .",
     "lint:prettier": "prettier --cache --experimental-cli --list-different .",
-    "lint:tsc": "tsc",
+    "lint:tsc": "tsc --noEmit",
     "format": "prettier --cache --experimental-cli --write . && eslint --cache --cache-location 'node_modules/.cache/eslint/.eslintcache' --fix .",
     "check": "pnpm install --frozen-lockfile && echo 'Ignore paths from lint-staged'",
     "node-modules:clean": "rm -rf ./node_modules && pnpm install"
@@ -20,10 +20,10 @@
       "pnpm run check"
     ],
     "**/*.{js,ts,tsx}": [
-      "pnpm lint"
+      "eslint --cache --fix"
     ],
     "**/*.{js,ts,tsx,md,json,css}": [
-      "pnpm format"
+      "prettier --cache --write"
     ]
   },
   "dependencies": {
@@ -43,7 +43,7 @@
     "lint-staged": "^16.1.5",
     "prettier": "^3.6.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "5.6.3"
   },
   "engines": {
     "node": ">=22.18.0"
