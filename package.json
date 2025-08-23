@@ -43,6 +43,10 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "packageManager": "pnpm@10.11.0",
   "volta": {
     "node": "22.18.0"
   }
