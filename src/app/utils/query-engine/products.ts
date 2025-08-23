@@ -76,7 +76,7 @@ export class ProductQueryEngine {
 
   private applyFilters(
     products: Product[],
-    filter: InternalQueryFilter
+    filter: InternalQueryFilter,
   ): Product[] {
     return products.filter((product) => {
       return Object.entries(filter).every(([field, filterValue]) => {
@@ -88,7 +88,7 @@ export class ProductQueryEngine {
   private matchesFilter(
     product: Product,
     field: string,
-    filterValue: InternalFilterValue
+    filterValue: InternalFilterValue,
   ): boolean {
     // For fixed product fields
     if (["id", "skuId", "updatedAt", "createdAt"].includes(field)) {
@@ -106,7 +106,7 @@ export class ProductQueryEngine {
 
   private matchesAttributesFilter(
     product: Product,
-    attributesFilter: InternalFilterValue
+    attributesFilter: InternalFilterValue,
   ): boolean {
     // Check if attributesFilter is an object
     if (
@@ -143,9 +143,9 @@ export class ProductQueryEngine {
         return this.matchesAttributeFilter(
           product,
           attributeKey,
-          attributeFilterValue
+          attributeFilterValue,
         );
-      }
+      },
     );
   }
 
@@ -154,10 +154,10 @@ export class ProductQueryEngine {
     attributeKey: string,
     filterValue:
       | InternalFilterValue
-      | { value?: InternalFilterValue; unit?: InternalFilterValue }
+      | { value?: InternalFilterValue; unit?: InternalFilterValue },
   ): boolean {
     const attribute = product.attributes.find(
-      (attr) => attr.key === attributeKey
+      (attr) => attr.key === attributeKey,
     );
 
     if (!attribute) {
@@ -242,7 +242,7 @@ export class ProductQueryEngine {
       if (
         this.evaluateCondition(
           (value as Record<string, unknown>).value,
-          simpleFilterValue
+          simpleFilterValue,
         )
       ) {
         return true;
@@ -259,7 +259,7 @@ export class ProductQueryEngine {
       if (
         this.evaluateCondition(
           (value as Record<string, unknown>).unit,
-          simpleFilterValue
+          simpleFilterValue,
         )
       ) {
         return true;
@@ -271,7 +271,7 @@ export class ProductQueryEngine {
 
   private evaluateCondition(
     targetValue: unknown,
-    filterValue: InternalFilterValue
+    filterValue: InternalFilterValue,
   ): boolean {
     // FilterValue is now always an object with operators
     return Object.entries(filterValue).every(([operator, operatorValue]) => {
@@ -282,7 +282,7 @@ export class ProductQueryEngine {
   private compareValues(
     targetValue: unknown,
     filterValue: unknown,
-    operator: string
+    operator: string,
   ): boolean {
     switch (operator) {
       case "$eq":
@@ -349,7 +349,7 @@ export class ProductQueryEngine {
 
   private applySorting(
     products: Product[],
-    sort: InternalQuerySort
+    sort: InternalQuerySort,
   ): Product[] {
     const { field, order } = sort;
 

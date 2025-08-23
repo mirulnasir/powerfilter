@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     console.error("Error processing attributes query:", error);
     return NextResponse.json(
       { error: "Failed to process attributes query" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

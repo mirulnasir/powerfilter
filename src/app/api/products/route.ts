@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     console.error("Error processing products query:", error);
     return Response.json(
       { error: "Failed to process products query" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

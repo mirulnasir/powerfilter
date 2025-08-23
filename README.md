@@ -100,15 +100,12 @@ Feel free to use any AI tools to help you with the assignment. However, you will
 ## FAQ
 
 1. Why are there weird fields present in the mock JSON but are not present in the types?
-
    - To simplify the assignment, we have removed some fields that are not relevant to the task, only focus on the fields that are present in the types provided.
 
 2. I think I found some issues with the mock data / apis provided.
-
    - Please fix the issues to the best of your ability and include it under the section "Fixes" in your SUBMISSION.md.
 
 3. I have some questions related to the user experience and the UI.
-
    - If you cannot get answers to your questions in time, please state your assumptions, continue with the assignment and include it under the section "Assumptions" in your SUBMISSION.md.
 
 4. Can I design the UI however I want? Can I include any additional features?

@@ -76,7 +76,7 @@ export class SupplierAttributeQueryEngine {
 
   private applyFilters(
     attributes: SupplierAttribute[],
-    filter: InternalQueryFilter
+    filter: InternalQueryFilter,
   ): SupplierAttribute[] {
     return attributes.filter((attribute) => {
       return Object.entries(filter).every(([field, filterValue]) => {
@@ -88,7 +88,7 @@ export class SupplierAttributeQueryEngine {
   private matchesFilter(
     attribute: SupplierAttribute,
     field: string,
-    filterValue: InternalFilterValue
+    filterValue: InternalFilterValue,
   ): boolean {
     // Handle all SupplierAttribute fields
     const validFields = [
@@ -113,7 +113,7 @@ export class SupplierAttributeQueryEngine {
 
   private evaluateCondition(
     targetValue: unknown,
-    filterValue: InternalFilterValue
+    filterValue: InternalFilterValue,
   ): boolean {
     // FilterValue is always an object with operators
     return Object.entries(filterValue).every(([operator, operatorValue]) => {
@@ -124,7 +124,7 @@ export class SupplierAttributeQueryEngine {
   private compareValues(
     targetValue: unknown,
     filterValue: unknown,
-    operator: string
+    operator: string,
   ): boolean {
     switch (operator) {
       case "$eq":
@@ -191,7 +191,7 @@ export class SupplierAttributeQueryEngine {
 
   private applySorting(
     attributes: SupplierAttribute[],
-    sort: InternalQuerySort
+    sort: InternalQuerySort,
   ): SupplierAttribute[] {
     const { field, order } = sort;
 
