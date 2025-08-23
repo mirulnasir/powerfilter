@@ -6,22 +6,44 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "prepare": "husky",
+    "lint": "pnpm run '/^linkt:.*/'",
+    "lint:eslint": "eslint --cache --cache-location 'node-modules/.cache/eslint/.eslintcache' .",
+    "lint: prettier": "prettier --cache --experimental-cli --list-different .",
+    "lint:tsc": "tsc",
+    "format": "prettier --cache --experimental-cli --write . && eslint --cache --cache-location 'node-modules/.cache/eslint/.eslintcache' --fix .",
+    "check": "pnpm install --frozen-lockfile && echo 'Ignore paths from lint-staged'"
+  },
+  "lint-staged": {
+    "+(package.json|pnpm-lock.yaml)": [
+      "pnpm run check"
+    ],
+    "**/*.js": [
+      "eslint --cache --fix"
+    ],
+    "**/*.{js,ts,tsx,md,css}": [
+      "prettier --cache --write"
+    ]
   },
   "dependencies": {
+    "next": "15.4.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "next": "15.4.4"
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
-    "@eslint/eslintrc": "^3"
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.5",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "volta": {
+    "node": "22.18.0"
   }
 }
