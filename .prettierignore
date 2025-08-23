@@ -1,4 +1,7 @@
 *.less.d.ts
+# next.js
+/.next/
+/out/
 node_modules
 coverage/
 dist/
