@@ -16,9 +16,26 @@ jobs:
           cancel_others: true
           skip_after_successful_duplicate: false
 
+  deps:
+    name: Prepare deps cache
+    needs: skip_check
+    if: needs.skip_check.outputs.should_skip != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: pnpm
+          node-version-file: package.json
+      - name: Prime pnpm store cache
+        run: pnpm fetch
+
   build:
     name: Build
-    needs: skip_check
+    needs: [skip_check, deps]
     if: needs.skip_check.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
     env:
@@ -27,15 +44,14 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - id: pnpm-setup
-        uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@v3
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           cache: pnpm
           node-version-file: package.json
-      - name: Install Deps
-        run: pnpm install --frozen-lockfile
+      - name: Install Deps (offline)
+        run: pnpm install --frozen-lockfile --prefer-offline
       - name: Check Nextjs Cache
         uses: actions/cache@v4
         with:
@@ -50,7 +66,7 @@ jobs:
 
   lint:
     name: Lint
-    needs: skip_check
+    needs: [skip_check, deps]
     if: needs.skip_check.outputs.should_skip != 'true'
     runs-on: ubuntu-latest
     env:
@@ -59,14 +75,13 @@ jobs:
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
-      - id: pnpm-setup
-        uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@v3
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           cache: pnpm
           node-version-file: package.json
-      - name: Install Deps
-        run: pnpm install --frozen-lockfile
+      - name: Install Deps (offline)
+        run: pnpm install --frozen-lockfile --prefer-offline
       - name: Lint
         run: pnpm lint
