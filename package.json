@@ -19,11 +19,11 @@
     "+(package.json|pnpm-lock.yaml)": [
       "pnpm run check"
     ],
-    "**/*.js": [
-      "eslint --cache --fix"
+    "**/*.{js,ts,tsx}": [
+      "pnpm lint"
     ],
-    "**/*.{js,ts,tsx,md,css}": [
-      "prettier --cache --write"
+    "**/*.{js,ts,tsx,md,json,css}": [
+      "pnpm format"
     ]
   },
   "dependencies": {
