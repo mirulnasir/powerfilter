@@ -13,7 +13,7 @@ jobs:
         id: skip_check
         with:
           concurrent_skipping: same_content_newer
-          cancel_other: true
+          cancel_others: true
           skip_after_successful_duplicate: false
   test:
     name: Lint & Test
