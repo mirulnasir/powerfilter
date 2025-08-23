@@ -8,10 +8,10 @@
     "start": "next start",
     "prepare": "husky",
     "lint": "pnpm run '/^linkt:.*/'",
-    "lint:eslint": "eslint --cache --cache-location 'node-modules/.cache/eslint/.eslintcache' .",
-    "lint: prettier": "prettier --cache --experimental-cli --list-different .",
+    "lint:eslint": "eslint --cache --cache-location 'node_modules/.cache/eslint/.eslintcache' .",
+    "lint:prettier": "prettier --cache --experimental-cli --list-different .",
     "lint:tsc": "tsc",
-    "format": "prettier --cache --experimental-cli --write . && eslint --cache --cache-location 'node-modules/.cache/eslint/.eslintcache' --fix .",
+    "format": "prettier --cache --experimental-cli --write . && eslint --cache --cache-location 'node_modules/.cache/eslint/.eslintcache' --fix .",
     "check": "pnpm install --frozen-lockfile && echo 'Ignore paths from lint-staged'"
   },
   "lint-staged": {
