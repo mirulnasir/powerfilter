@@ -1,8 +1,6 @@
-import { Filter } from "@/components/filter";
-import { DataTable } from "./_components/table";
-import { columns, Payment } from "./_components/table/columns";
 import { SupplierAttribute } from "../types/attribute";
 import { DashboardContent } from "./_components/dashboard-content";
+import { Payment } from "./_components/table/columns";
 
 async function getData(): Promise<Payment[]> {
   // Fetch data from your API here.
