@@ -2,6 +2,24 @@ import { SupplierAttribute } from "../types/attribute";
 import { DashboardContent } from "./_components/dashboard-content";
 import { Payment } from "./_components/table/columns";
 
+async function getAttributes(): Promise<SupplierAttribute[]> {
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+  try {
+    const response = await fetch(`${baseUrl}/api/attributes`, {
+      method: "POST",
+    });
+    if (!response.ok) {
+      throw new Error();
+    } else {
+      const data = await response.json();
+      return data;
+    }
+  } catch (error) {
+    console.error("Error fetching attributes:", error);
+    return [];
+  }
+}
+
 async function getData(): Promise<Payment[]> {
   // Fetch data from your API here.
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -23,7 +41,7 @@ async function getData(): Promise<Payment[]> {
     throw new Error();
   } else {
     const data = await products.json();
-    console.log("data", data);
+    return data;
   }
 
   return [
@@ -99,6 +117,9 @@ async function getData(): Promise<Payment[]> {
 
 export default async function Home() {
   const data = await getData();
+  const attributes = await getAttributes();
+  console.log({ data });
+  console.log({ attributes });
 
   return (
     <main>
