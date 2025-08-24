@@ -1,3 +1,4 @@
+import { getAttributeKeys } from "../services/products/getAttributeKeys";
 import { SupplierAttribute } from "../types/attribute";
 import { DashboardContent } from "./_components/dashboard-content";
 import { Payment } from "./_components/table/columns";
@@ -118,8 +119,10 @@ async function getData(): Promise<Payment[]> {
 export default async function Home() {
   const data = await getData();
   const attributes = await getAttributes();
+  const attributeKeys = await getAttributeKeys();
   console.log({ data });
   console.log({ attributes });
+  console.log({ attributeKeys });
 
   return (
     <main>

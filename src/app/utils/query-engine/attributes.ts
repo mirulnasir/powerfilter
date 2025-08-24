@@ -232,4 +232,40 @@ export class SupplierAttributeQueryEngine {
       return order === "ASC" ? comparison : -comparison;
     });
   }
+
+  /**
+   * Retrieves unique keys from all supplier attributes
+   * @returns Promise resolving to array of unique attribute keys
+   * @example
+   * const keys = await engine.getKeys();
+   * // Returns: ["name", "category", "supplier", "value", ...]
+   */
+  async getKeys(): Promise<InternalQueryResponse<string>> {
+    const artificialDelay = Math.random() * 700 + 300;
+    const start = Date.now();
+    await new Promise((resolve) => setTimeout(resolve, artificialDelay));
+
+    const keySet = new Set<string>();
+
+    // Extract all unique keys from attributes
+    console.log("this.attributes", this.attributes[0]);
+    this.attributes.forEach((attribute) => {
+      keySet.add(attribute.key);
+    });
+
+    console.log(`getKeys completed in ${Date.now() - start}ms`);
+
+    return {
+      total: this.attributes.length,
+      data: Array.from(keySet).sort(),
+      debugInfo: {
+        duration: Date.now() - start,
+      },
+      pagination: {
+        offset: 0,
+        limit: this.attributes.length,
+        hasMore: false,
+      },
+    };
+  }
 }
