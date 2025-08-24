@@ -1,5 +1,8 @@
+import { Filter } from "@/components/filter";
 import { DataTable } from "./_components/table";
 import { columns, Payment } from "./_components/table/columns";
+import { SupplierAttribute } from "../types/attribute";
+import { DashboardContent } from "./_components/dashboard-content";
 
 async function getData(): Promise<Payment[]> {
   // Fetch data from your API here.
@@ -101,7 +104,11 @@ export default async function Home() {
 
   return (
     <main>
-      <DataTable columns={columns} data={data} />
+      <DashboardContent
+        initialData={data}
+        attributes={["name", "description"] as unknown as SupplierAttribute[]}
+      />
+      {/* <DataTable columns={columns} data={data} /> */}
     </main>
   );
 }
