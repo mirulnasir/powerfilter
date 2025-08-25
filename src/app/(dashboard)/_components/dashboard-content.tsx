@@ -1,7 +1,7 @@
 "use client";
 
 import { SupplierAttribute } from "@/app/types/attribute";
-import { Filter } from "@/components/filter";
+import { Filter, InlineFilter } from "@/components/filter";
 import { useState } from "react";
 import { DataTable } from "./table";
 import { columns } from "./table/columns";
@@ -29,6 +29,10 @@ export function DashboardContent({
   return (
     <main>
       <Filter attributes={attributes} onFilterChange={handleFilterChange} />
+      <InlineFilter
+        attributes={attributes}
+        onFilterChange={handleFilterChange}
+      />
       <DataTable
         columns={columns as ColumnDef<unknown>[]}
         data={filteredData}
