@@ -1,13 +1,20 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { getProducts } from "./getProducts";
-import { ProductQuery } from "@/app/types/query-engine/product";
 import { Product } from "@/app/types/product";
+import { ProductQuery } from "@/app/types/query-engine/product";
+import { queryOptions, useMutation } from "@tanstack/react-query";
+import { getProducts } from "./getProducts";
+import { InternalQueryResponse } from "@/app/types/query-engine/common";
 
-export const useGetProducts = () => {
-  return useMutation<Product[], Error, ProductQuery>({
+export const initialProductsOptions = queryOptions({
+  queryKey: ["products"],
+  queryFn: () => getProducts({}),
+});
+
+export const useLazyGetProducts = () => {
+  return useMutation<InternalQueryResponse<Product>, Error, ProductQuery>({
     mutationFn: (query: ProductQuery) => getProducts(query),
     onSuccess: (data) => {
       console.log("data", data);
+      return data;
     },
     onError: (error) => {
       console.error("Error fetching products:", error);

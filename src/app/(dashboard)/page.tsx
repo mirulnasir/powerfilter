@@ -1,8 +1,8 @@
-import { getAttributeKeys } from "../services/products/getAttributeKeys";
+import { getQueryClient } from "@/lib/react-query/get-query-client";
+import { initialProductsOptions } from "../services/products/getProducts";
 import { SupplierAttribute } from "../types/attribute";
-import { Product } from "../types/product";
-import { InternalQueryResponse } from "../types/query-engine/common";
 import { DashboardContent } from "./_components/dashboard-content";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
 async function getAttributes(): Promise<SupplierAttribute[]> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -22,45 +22,17 @@ async function getAttributes(): Promise<SupplierAttribute[]> {
   }
 }
 
-async function getData(): Promise<InternalQueryResponse<Product>> {
-  // Fetch data from your API here.
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
-  const products = await fetch(`${baseUrl}/api/products`, {
-    method: "POST",
-    body: JSON.stringify({
-      filter: {
-        attributes: {
-          netWeightPerUnitValue: {
-            value: {
-              $gt: 10,
-            },
-          },
-        },
-      },
-    }),
-  });
-  if (!products.ok) {
-    throw new Error();
-  } else {
-    const data = await products.json();
-    return data;
-  }
-}
-
 export default async function Home() {
-  const data = await getData();
-  const attributes = await getAttributes();
-  const attributeKeys = await getAttributeKeys();
-  console.log({ data });
-  console.log({ attributes });
-  console.log({ attributeKeys });
+  const queryClient = getQueryClient();
+  void queryClient.prefetchQuery(initialProductsOptions);
 
   return (
     <main>
-      <DashboardContent
-        initialData={data.data || []}
-        attributes={["name", "description"] as unknown as SupplierAttribute[]}
-      />
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <DashboardContent
+          attributes={["name", "description"] as unknown as SupplierAttribute[]}
+        />
+      </HydrationBoundary>
       {/* <DataTable columns={columns} data={data} /> */}
     </main>
   );

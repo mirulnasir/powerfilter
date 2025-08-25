@@ -1,7 +1,11 @@
 import { ProductQuery } from "@/app/types/query-engine/product";
 import { baseUrl } from "../../config";
+import { InternalQueryResponse } from "@/app/types/query-engine/common";
+import { Product } from "@/app/types/product";
 
-export const getProducts = async (query: ProductQuery) => {
+export const getProducts = async (
+  query: ProductQuery,
+): Promise<InternalQueryResponse<Product>> => {
   try {
     const response = await fetch(`${baseUrl}/api/products`, {
       method: "POST",
@@ -15,6 +19,17 @@ export const getProducts = async (query: ProductQuery) => {
     }
   } catch (error) {
     console.error("Error fetching products:", error);
-    return [];
+    return {
+      data: [],
+      total: 0,
+      pagination: {
+        offset: 0,
+        limit: 0,
+        hasMore: false,
+      },
+      debugInfo: {
+        duration: 0,
+      },
+    };
   }
 };
