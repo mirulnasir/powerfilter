@@ -1,7 +1,7 @@
 "use client";
 
 import { Product, ProductAttribute } from "@/app/types/product";
-import { ColumnDef, Table } from "@tanstack/react-table";
+import { ColumnDef, Row, Table } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { InternalQuerySort } from "@/app/types/query-engine/common";
@@ -14,6 +14,21 @@ const getAttribute = (attributes: ProductAttribute[], key: string) => {
 type MetaType = {
   sort: InternalQuerySort | undefined;
   onSortChange: ((sort: InternalQuerySort | undefined) => void) | undefined;
+};
+
+const AttributeCell = ({ row, name }: { row: Row<Product>; name: string }) => {
+  return <>{getAttribute(row.original.attributes, name)?.value?.toString()}</>;
+};
+
+const AttributeHeader = ({ name }: { name: string }) => {
+  return (
+    <div className="flex items-center gap-2">
+      <div className="text-xs font-medium font-mono bg-muted px-2 py-1 rounded-md">
+        attr
+      </div>
+      <div className="">{name}</div>
+    </div>
+  );
 };
 
 /**
@@ -107,20 +122,17 @@ export const columns: ColumnDef<Product>[] = [
     ),
   },
   {
-    header: "Attributes",
-    columns: [
-      {
-        header: "Name",
-        cell: ({ row }) => {
-          return <>{getAttribute(row.original.attributes, "name")?.value}</>;
-        },
-      },
-      {
-        header: "Brand",
-        cell: ({ row }) => {
-          return <>{getAttribute(row.original.attributes, "brand")?.value}</>;
-        },
-      },
-    ],
+    accessorKey: "Name",
+    header: ({}) => <AttributeHeader name="Name" />,
+    cell: ({ row }) => {
+      return <AttributeCell row={row} name="name" />;
+    },
+  },
+  {
+    accessorKey: "Brand",
+    header: ({}) => <AttributeHeader name="Brand" />,
+    cell: ({ row }) => {
+      return <AttributeCell row={row} name="brand" />;
+    },
   },
 ];

@@ -82,19 +82,23 @@ export function DashboardContent({
   };
 
   return (
-    <main>
-      <InlineFilter
-        attributes={attributes}
-        filters={filterRules}
-        onFilterChange={handleFilterChange}
-      />
-      <DataTable
-        columns={columns as ColumnDef<unknown>[]}
-        data={productsData?.data ?? []}
-        sort={currentSort}
-        onSortChange={handleSortChange}
-        isLoading={isLoading}
-      />
-    </main>
+    <div className="flex flex-col h-full">
+      <div className="grow-0 shrink-0 ">
+        <InlineFilter
+          attributes={attributes}
+          filters={filterRules}
+          onFilterChange={handleFilterChange}
+        />
+      </div>
+      <div className="h-full flex flex-col min-w-0 box-border overflow-hidden">
+        <DataTable
+          columns={columns as ColumnDef<unknown>[]}
+          data={productsData?.data ?? []}
+          sort={currentSort}
+          onSortChange={handleSortChange}
+          isLoading={isLoading}
+        />
+      </div>
+    </div>
   );
 }
