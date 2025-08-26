@@ -1,4 +1,4 @@
-import { BASE_FIELD_OPTIONS } from "./constants";
+import { FILTER_FIELD_OPTIONS } from "./constants";
 import { FilterRule } from "./types";
 import { SupplierAttribute } from "@/app/types/attribute";
 
@@ -21,7 +21,7 @@ export function getUsedFieldKeys(rules: FilterRule[]): Set<string> {
  * @returns Filtered field options excluding used ones
  */
 export function getAvailableFieldOptions(usedFields: Set<string>) {
-  return BASE_FIELD_OPTIONS.filter(
+  return FILTER_FIELD_OPTIONS.filter(
     (option) => !usedFields.has(option.value) || option.value === "attributes",
   );
 }

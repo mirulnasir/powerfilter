@@ -8,7 +8,7 @@ import { FilterRule } from "./types";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { InternalFilterValue } from "@/app/types/query-engine/common";
 import { cn } from "@/lib/utils";
-import { BASE_FIELD_OPTIONS } from "./constants";
+import { FILTER_FIELD_OPTIONS } from "./constants";
 import { getAvailableFieldOptions, getAvailableAttributes } from "./utils";
 
 /**
@@ -92,7 +92,7 @@ function FilterRuleComponent({
   );
 
   // Find the currently selected field option (search in ALL options, not just available)
-  const selectedFieldOption = BASE_FIELD_OPTIONS.find(
+  const selectedFieldOption = FILTER_FIELD_OPTIONS.find(
     (option) => option.value === rule.field,
   );
 
