@@ -1,7 +1,7 @@
 "use client";
 
 import { initialProductsOptions } from "@/app/services/products/getProducts";
-import { SupplierAttribute } from "@/app/types/attribute";
+
 import { InternalQuerySort } from "@/app/types/query-engine/common";
 import { InlineFilter } from "@/components/filter";
 import {
@@ -21,14 +21,10 @@ import { columns } from "./table/columns";
 import { DataTablePagination } from "./table/data-table-pagination";
 
 interface DashboardContentProps {
-  attributes: SupplierAttribute[];
   filterString: string | string[];
 }
 
-export function DashboardContent({
-  attributes,
-  filterString,
-}: DashboardContentProps) {
+export function DashboardContent({ filterString }: DashboardContentProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filterRules = filtersFromSearchParams(filterString, "filter");
@@ -121,7 +117,6 @@ export function DashboardContent({
     <div className="flex flex-col h-full">
       <div className="grow-0 shrink-0 ">
         <InlineFilter
-          attributes={attributes}
           filters={filterRules}
           onFilterChange={handleFilterChange}
         />

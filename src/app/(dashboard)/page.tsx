@@ -5,7 +5,7 @@ import {
 import { getQueryClient } from "@/lib/react-query/get-query-client";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { initialProductsOptions } from "../services/products/getProducts";
-import { SupplierAttribute } from "../types/attribute";
+
 import { DashboardContent } from "./_components/dashboard-content";
 
 // async function getAttributes(): Promise<SupplierAttribute[]> {
@@ -46,10 +46,7 @@ export default async function Home({
   return (
     <main>
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <DashboardContent
-          attributes={["name", "description"] as unknown as SupplierAttribute[]}
-          filterString={params.filter}
-        />
+        <DashboardContent filterString={params.filter} />
       </HydrationBoundary>
       {/* <DataTable columns={columns} data={data} /> */}
     </main>

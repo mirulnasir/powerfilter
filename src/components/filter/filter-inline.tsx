@@ -1,15 +1,13 @@
 "use client";
 
-import { SupplierAttribute } from "@/app/types/attribute";
 import { Button } from "@/components/ui/button";
-import { Filter, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useCallback, useState } from "react";
 import { FilterRuleComponent } from "./filter-rule";
 import { FilterRule } from "./types";
 import { getUsedFieldKeys } from "./utils";
 
 interface InlineFilterProps {
-  attributes: SupplierAttribute[];
   filters: FilterRule[];
   onFilterChange: (rules: FilterRule[]) => void;
 }
@@ -20,7 +18,6 @@ interface InlineFilterProps {
  * Apply button sends only valid rules and removes invalid ones from the UI
  */
 export function InlineFilter({
-  attributes,
   filters = [],
   onFilterChange,
 }: InlineFilterProps) {
@@ -135,7 +132,6 @@ export function InlineFilter({
         <FilterRuleComponent
           key={rule.id}
           rule={rule}
-          attributes={attributes}
           usedFieldKeys={usedFieldKeys}
           onUpdate={updateFilterRule}
           onRemove={removeFilterRule}
@@ -153,21 +149,15 @@ export function InlineFilter({
         Add Filter
       </Button>
 
-      {/* Apply Filter Button - only show when there are rules */}
       {totalRulesCount > 0 && (
-        <Button
-          onClick={applyFilters}
-          className="h-12"
-          variant={hasInvalidRules ? "destructive" : "default"}
-        >
-          <Filter className="size-4" />
-          Apply Filter{hasInvalidRules ? " & Remove Invalid" : ""}
+        <Button onClick={applyFilters} className="h-12" variant={"default"}>
+          Apply Filter
         </Button>
       )}
 
       {/* Filter Status */}
       {totalRulesCount > 0 && (
-        <div className="text-sm text-muted-foreground">
+        <div className="text-xs text-muted-foreground max-w-36">
           {validRulesCount} of {totalRulesCount} filter rule
           {totalRulesCount !== 1 ? "s" : ""}{" "}
           {validRulesCount === 1 ? "is" : "are"} valid

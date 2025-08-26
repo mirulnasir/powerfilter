@@ -3,19 +3,20 @@ import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Input } from "../ui/input";
 import { SupplierAttribute } from "@/app/types/attribute";
+import { AttributeFieldType } from "@/app/enums/attribute";
 import { OPERATORS, CleanOperator } from "./constants";
 import { FilterRule } from "./types";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { FILTER_FIELD_OPTIONS } from "./constants";
-import { getAvailableFieldOptions, getAvailableAttributes } from "./utils";
+import { getAvailableFieldOptions } from "./utils";
+import { AttributeCombobox } from "./attribute-combobox";
 
 /**
  * Props for individual filter rule component
  */
 interface FilterRuleProps {
   rule: FilterRule;
-  attributes: SupplierAttribute[];
   usedFieldKeys: Set<string>;
   onUpdate: (ruleId: string, updates: Partial<FilterRule>) => void;
   onRemove: (ruleId: string) => void;
@@ -47,7 +48,6 @@ function isValidFilterRule(rule: FilterRule): boolean {
  */
 function FilterRuleComponent({
   rule,
-  attributes,
   usedFieldKeys,
   onUpdate,
   onRemove,
@@ -82,11 +82,6 @@ function FilterRuleComponent({
   const availableFieldOptions = useMemo(
     () => getAvailableFieldOptions(usedFieldKeysExcludingCurrent),
     [usedFieldKeysExcludingCurrent],
-  );
-
-  const availableAttributes = useMemo(
-    () => getAvailableAttributes(attributes, usedFieldKeysExcludingCurrent),
-    [attributes, usedFieldKeysExcludingCurrent],
   );
 
   // Find the currently selected field option (search in ALL options, not just available)
@@ -197,10 +192,17 @@ function FilterRuleComponent({
       return "Select field...";
     }
 
+    // If attributes category is selected but no specific attribute yet
     if (rule.fieldType === "attribute" && rule.field === "attributes") {
       return "Select attribute...";
     }
 
+    // If a specific attribute is selected, show "Attribute" as the category
+    if (rule.fieldType === "attribute" && rule.field !== "attributes") {
+      return "Attribute";
+    }
+
+    // For base fields, show the field label
     return rule.displayName || selectedFieldOption?.label || "Select field...";
   };
 
@@ -225,7 +227,7 @@ function FilterRuleComponent({
             className="w-32 justify-between h-full"
           >
             <span className="truncate">{getFieldDisplayText()}</span>
-            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-32 p-0">
@@ -243,40 +245,35 @@ function FilterRuleComponent({
         </PopoverContent>
       </Popover>
 
-      {/* Attribute Selection Popover - Only shown when "attributes" is selected */}
+      {/* Attribute Selection Combobox - Only shown when "attributes" is selected */}
       {rule.fieldType === "attribute" && rule.field === "attributes" && (
-        <Popover
-          open={openPopover === "attribute"}
-          onOpenChange={(open) => setOpenPopover(open ? "attribute" : null)}
-        >
-          <PopoverTrigger asChild>
-            <Button
-              ref={attributeButtonRef}
-              variant="outline"
-              className="w-36 justify-between  h-full"
-            >
-              <span className="truncate">Select attribute...</span>
-              <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="start" className="w-48 p-0">
-            <div className="p-1 max-h-64 overflow-y-auto">
-              {availableAttributes.map((attribute) => (
-                <button
-                  key={attribute.key}
-                  onClick={() => handleAttributeSelect(attribute)}
-                  className="w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none"
-                >
-                  <span className="font-medium">{attribute.name}</span>
-                  <span className="text-xs text-muted-foreground block">
-                    {attribute.key}
-                  </span>
-                </button>
-              ))}
-            </div>
-          </PopoverContent>
-        </Popover>
+        <AttributeCombobox
+          onSelect={handleAttributeSelect}
+          placeholder="Search attributes..."
+          className="w-36 h-full"
+          usedAttributeKeys={usedFieldKeysExcludingCurrent}
+        />
       )}
+
+      {/* Selected Attribute Display - Only shown when specific attribute is selected */}
+      {rule.fieldType === "attribute" &&
+        rule.field !== "attributes" &&
+        rule.field && (
+          <AttributeCombobox
+            value={{
+              key: rule.field,
+              name: rule.displayName || rule.field,
+              id: rule.field,
+              type: AttributeFieldType.TEXT, // Default type for display
+              createdAt: 0,
+              updatedAt: 0,
+            }}
+            onSelect={handleAttributeSelect}
+            placeholder="Search attributes..."
+            className="w-36 h-full"
+            usedAttributeKeys={usedFieldKeysExcludingCurrent}
+          />
+        )}
 
       {/* Operator Popover - Shows with default "=" selected */}
       <Popover
@@ -287,12 +284,15 @@ function FilterRuleComponent({
           <Button
             ref={operatorButtonRef}
             variant="outline"
-            className="w-24 justify-between items-center h-full"
+            className="w-32 gap-x-2  justify-start items-center h-full"
           >
-            <span className="truncate font-mono">
+            <span className="truncate font-mono w-4">
               {selectedOperator?.symbol || "="}
             </span>
-            <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <span className="text-xs text-muted-foreground truncate">
+              {selectedOperator?.label}
+            </span>
+            <ChevronDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-56 p-0">
@@ -304,7 +304,7 @@ function FilterRuleComponent({
                 className="w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none"
               >
                 <div className="flex items-center gap-2">
-                  <span className="font-mono">{op.symbol}</span>
+                  <span className="font-mono w-4">{op.symbol}</span>
                   <span className="text-xs">{op.label}</span>
                 </div>
               </button>
