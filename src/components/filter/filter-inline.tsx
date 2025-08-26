@@ -10,6 +10,7 @@ import { getUsedFieldKeys } from "./utils";
 
 interface InlineFilterProps {
   attributes: SupplierAttribute[];
+  filters: FilterRule[];
   onFilterChange: (rules: FilterRule[]) => void;
 }
 
@@ -20,13 +21,15 @@ interface InlineFilterProps {
  */
 export function InlineFilter({
   attributes,
+  filters = [],
   onFilterChange,
 }: InlineFilterProps) {
-  const [filterRules, setFilterRules] = useState<FilterRule[]>([]);
+  const [filterRules, setFilterRules] = useState<FilterRule[]>(filters);
   const [validationStates, setValidationStates] = useState<
     Record<string, boolean>
   >({});
 
+  console.log({ filters, filterRules });
   // Get currently used field keys to prevent duplicates
   const usedFieldKeys = getUsedFieldKeys(filterRules);
 
@@ -106,7 +109,7 @@ export function InlineFilter({
         return newStates;
       });
     }
-
+    console.log("validRules", validRules);
     // Notify parent with valid rules
     onFilterChange(validRules);
   }, [filterRules, validationStates, onFilterChange]);

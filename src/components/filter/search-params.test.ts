@@ -237,7 +237,7 @@ describe("search-params", () => {
       ];
 
       const result = filtersToSearchParams(filters);
-      const params = result.getAll("filters");
+      const params = result.getAll("filter"); // Changed from "filters" to "filter"
 
       expect(params).toEqual(["base:price:gt:100", "attribute:color:eq:red"]);
     });
@@ -257,7 +257,7 @@ describe("search-params", () => {
       const params = result.getAll("customFilters");
 
       expect(params).toEqual(["base:price:gt:100"]);
-      expect(result.getAll("filters")).toEqual([]);
+      expect(result.getAll("filter")).toEqual([]); // Changed from "filters" to "filter"
     });
 
     it("should handle empty filters array", () => {
@@ -273,8 +273,8 @@ describe("search-params", () => {
 
     it("should parse filters from URLSearchParams object", () => {
       const params = new URLSearchParams();
-      params.append("filters", "base:price:gt:100");
-      params.append("filters", "attribute:color:eq:red");
+      params.append("filter", "base:price:gt:100"); // Changed from "filters" to "filter"
+      params.append("filter", "attribute:color:eq:red"); // Changed from "filters" to "filter"
 
       const result = filtersFromSearchParams(params);
 
@@ -297,12 +297,53 @@ describe("search-params", () => {
 
     it("should parse filters from search string", () => {
       const searchString =
-        "?filters=base%3Aprice%3Agt%3A100&filters=attribute%3Acolor%3Aeq%3Ared";
+        "?filter=base%3Aprice%3Agt%3A100&filter=attribute%3Acolor%3Aeq%3Ared"; // Changed from "filters" to "filter"
       const result = filtersFromSearchParams(searchString);
 
       expect(result).toHaveLength(2);
       expect(result[0].field).toBe("price");
       expect(result[1].field).toBe("color");
+    });
+
+    it("should parse filters from string array (Next.js searchParams case)", () => {
+      const filterArray = ["base:price:gt:100", "attribute:color:eq:red"];
+
+      const result = filtersFromSearchParams(filterArray);
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).toEqual({
+        id: "base-price-gt-1234567890",
+        fieldType: "base",
+        field: "price",
+        operator: "gt",
+        value: "100",
+      });
+      expect(result[1]).toEqual({
+        id: "attribute-color-eq-1234567890",
+        fieldType: "attribute",
+        field: "color",
+        operator: "eq",
+        value: "red",
+      });
+    });
+
+    it("should handle empty string array", () => {
+      const result = filtersFromSearchParams([]);
+      expect(result).toEqual([]);
+    });
+
+    it("should filter out invalid filter strings from array", () => {
+      const filterArray = [
+        "base:price:gt:100", // valid
+        "invalid:format", // invalid
+        "attribute:color:eq:blue", // valid
+      ];
+
+      const result = filtersFromSearchParams(filterArray);
+      expect(result).toHaveLength(2);
+      expect(result[0].field).toBe("price");
+      expect(result[1].field).toBe("color");
+      expect(result[1].value).toBe("blue");
     });
 
     it("should use custom param name", () => {
@@ -321,8 +362,8 @@ describe("search-params", () => {
 
     it("should filter out invalid filter strings", () => {
       const params = new URLSearchParams();
-      params.append("filters", "base:price:gt:100"); // valid
-      params.append("filters", "invalid:format"); // invalid
+      params.append("filter", "base:price:gt:100"); // valid, changed from "filters"
+      params.append("filter", "invalid:format"); // invalid, changed from "filters"
 
       const result = filtersFromSearchParams(params);
       expect(result).toHaveLength(1);
@@ -333,28 +374,28 @@ describe("search-params", () => {
   describe("searchParamsToProductQuery", () => {
     it("should convert search params to ProductQuery filter structure", () => {
       const searchString =
-        "?filters=base:id:eq:123&filters=attribute:color:regex:^red";
+        "?filter=base:id:eq:123&filter=attribute:color:regex:^red"; // Changed from "filters" to "filter"
       const result = searchParamsToProductQuery(searchString);
 
       expect(result).toEqual({
-        id: { eq: 123 }, // Should convert to number
+        id: { $eq: 123 }, // Added dollar sign
         attributes: {
-          color: { regex: "^red" },
+          color: { $regex: "^red" }, // Added dollar sign
         },
       });
     });
 
     it("should handle URLSearchParams object", () => {
       const params = new URLSearchParams();
-      params.append("filters", "base:price:gt:100");
-      params.append("filters", "attribute:size:in:S,M,L");
+      params.append("filter", "base:price:gt:100"); // Changed from "filters" to "filter"
+      params.append("filter", "attribute:size:in:S,M,L"); // Changed from "filters" to "filter"
 
       const result = searchParamsToProductQuery(params);
 
       expect(result).toEqual({
-        price: { gt: 100 },
+        price: { $gt: 100 }, // Added dollar sign
         attributes: {
-          size: { in: ["S", "M", "L"] },
+          size: { $in: ["S", "M", "L"] }, // Added dollar sign
         },
       });
     });
@@ -362,30 +403,30 @@ describe("search-params", () => {
     it("should handle value conversion for different operators", () => {
       const params = new URLSearchParams();
       // Numeric operators
-      params.append("filters", "base:price:gt:100.50");
-      params.append("filters", "base:quantity:lte:10");
+      params.append("filter", "base:price:gt:100.50"); // Changed from "filters"
+      params.append("filter", "base:quantity:lte:10"); // Changed from "filters"
       // Boolean operator
-      params.append("filters", "base:active:exists:true");
+      params.append("filter", "base:active:exists:true"); // Changed from "filters"
       // Equality with boolean
-      params.append("filters", "base:featured:eq:false");
+      params.append("filter", "base:featured:eq:false"); // Changed from "filters"
       // Equality with null
-      params.append("filters", "base:description:ne:null");
+      params.append("filter", "base:description:ne:null"); // Changed from "filters"
       // Array operator
-      params.append("filters", "attribute:tags:in:tag1,tag2,123,true,null");
+      params.append("filter", "attribute:tags:in:tag1,tag2,123,true,null"); // Changed from "filters"
       // Regex operator
-      params.append("filters", "attribute:name:regex:^product");
+      params.append("filter", "attribute:name:regex:^product"); // Changed from "filters"
 
       const result = searchParamsToProductQuery(params);
 
       expect(result).toEqual({
-        price: { gt: 100.5 },
-        quantity: { lte: 10 },
-        active: { exists: true },
-        featured: { eq: false },
-        description: { ne: null },
+        price: { $gt: 100.5 }, // Added dollar sign
+        quantity: { $lte: 10 }, // Added dollar sign
+        active: { $exists: true }, // Added dollar sign
+        featured: { $eq: false }, // Added dollar sign
+        description: { $ne: null }, // Added dollar sign
         attributes: {
-          tags: { in: ["tag1", "tag2", 123, true, null] },
-          name: { regex: "^product" },
+          tags: { $in: ["tag1", "tag2", 123, true, null] }, // Added dollar sign
+          name: { $regex: "^product" }, // Added dollar sign
         },
       });
     });
@@ -395,7 +436,7 @@ describe("search-params", () => {
       const result = searchParamsToProductQuery(searchString, "customFilters");
 
       expect(result).toEqual({
-        price: { gt: 100 },
+        price: { $gt: 100 }, // Added dollar sign
       });
     });
 
@@ -406,14 +447,14 @@ describe("search-params", () => {
 
     it("should skip invalid filter strings", () => {
       const params = new URLSearchParams();
-      params.append("filters", "base:price:gt:100"); // valid
-      params.append("filters", "invalid:format"); // invalid
-      params.append("filters", "unknown:field:gt:50"); // invalid fieldType
+      params.append("filter", "base:price:gt:100"); // valid, changed from "filters"
+      params.append("filter", "invalid:format"); // invalid, changed from "filters"
+      params.append("filter", "unknown:field:gt:50"); // invalid fieldType, changed from "filters"
 
       const result = searchParamsToProductQuery(params);
 
       expect(result).toEqual({
-        price: { gt: 100 },
+        price: { $gt: 100 }, // Added dollar sign
       });
     });
 
@@ -424,29 +465,29 @@ describe("search-params", () => {
 
     it("should handle multiple filters for the same field (should overwrite)", () => {
       const params = new URLSearchParams();
-      params.append("filters", "base:price:gt:100");
-      params.append("filters", "base:price:lt:200");
+      params.append("filter", "base:price:gt:100"); // Changed from "filters"
+      params.append("filter", "base:price:lt:200"); // Changed from "filters"
 
       const result = searchParamsToProductQuery(params);
 
       // Last filter should win
       expect(result).toEqual({
-        price: { lt: 200 },
+        price: { $lt: 200 }, // Added dollar sign
       });
     });
 
     it("should handle numeric string conversion edge cases", () => {
       const params = new URLSearchParams();
-      params.append("filters", "base:price:gt:not-a-number");
-      params.append("filters", "base:weight:gte:0");
-      params.append("filters", "base:score:lt:-5.5");
+      params.append("filter", "base:price:gt:not-a-number"); // Changed from "filters"
+      params.append("filter", "base:weight:gte:0"); // Changed from "filters"
+      params.append("filter", "base:score:lt:-5.5"); // Changed from "filters"
 
       const result = searchParamsToProductQuery(params);
 
       expect(result).toEqual({
-        price: { gt: "not-a-number" }, // Should remain as string if not a number
-        weight: { gte: 0 },
-        score: { lt: -5.5 },
+        price: { $gt: "not-a-number" }, // Should remain as string if not a number, added dollar sign
+        weight: { $gte: 0 }, // Added dollar sign
+        score: { $lt: -5.5 }, // Added dollar sign
       });
     });
   });
@@ -513,9 +554,9 @@ describe("search-params", () => {
       const productQuery = searchParamsToProductQuery(searchParams);
 
       expect(productQuery).toEqual({
-        price: { gte: 50.99 },
+        price: { $gte: 50.99 }, // Added dollar sign
         attributes: {
-          category: { in: ["electronics", "books", "clothing"] },
+          category: { $in: ["electronics", "books", "clothing"] }, // Added dollar sign
         },
       });
     });

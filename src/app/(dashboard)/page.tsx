@@ -1,12 +1,9 @@
+import { searchParamsToProductQuery } from "@/components/filter/search-params";
 import { getQueryClient } from "@/lib/react-query/get-query-client";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { initialProductsOptions } from "../services/products/getProducts";
 import { SupplierAttribute } from "../types/attribute";
 import { DashboardContent } from "./_components/dashboard-content";
-import {
-  filtersFromSearchParams,
-  stringsToFilters,
-} from "@/components/filter/search-params";
 
 // async function getAttributes(): Promise<SupplierAttribute[]> {
 //   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -29,19 +26,24 @@ import {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ filters: string }>;
+  searchParams: Promise<{ filter: string | string[] }>;
 }) {
-  const filter = (await searchParams).filters;
-  console.log(filter);
-  const filterRules = filtersFromSearchParams(filter, "filters");
+  const params = await searchParams;
+
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(initialProductsOptions({}));
+  const productQuery = searchParamsToProductQuery(params.filter, "filter");
+  void queryClient.prefetchQuery(
+    initialProductsOptions({
+      filter: productQuery,
+    }),
+  );
 
   return (
     <main>
       <HydrationBoundary state={dehydrate(queryClient)}>
         <DashboardContent
           attributes={["name", "description"] as unknown as SupplierAttribute[]}
+          filterString={params.filter}
         />
       </HydrationBoundary>
       {/* <DataTable columns={columns} data={data} /> */}

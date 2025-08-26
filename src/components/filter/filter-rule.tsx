@@ -222,7 +222,7 @@ function FilterRuleComponent({
           <Button
             ref={fieldButtonRef}
             variant="outline"
-            className="w-40 justify-between"
+            className="w-32 justify-between"
           >
             <span className="truncate">{getFieldDisplayText()}</span>
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -253,7 +253,7 @@ function FilterRuleComponent({
             <Button
               ref={attributeButtonRef}
               variant="outline"
-              className="w-40 justify-between"
+              className="w-36 justify-between"
             >
               <span className="truncate">Select attribute...</span>
               <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />

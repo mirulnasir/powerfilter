@@ -4,10 +4,10 @@ import { queryOptions, useMutation } from "@tanstack/react-query";
 import { getProducts } from "./getProducts";
 import { InternalQueryResponse } from "@/app/types/query-engine/common";
 
-export const initialProductsOptions = (filter: ProductQuery["filter"]) =>
+export const initialProductsOptions = (query: ProductQuery) =>
   queryOptions({
-    queryKey: ["products", filter],
-    queryFn: () => getProducts({ filter }),
+    queryKey: ["products", query],
+    queryFn: () => getProducts(query),
   });
 
 export const useLazyGetProducts = () => {

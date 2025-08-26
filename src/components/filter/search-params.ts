@@ -4,248 +4,303 @@ import { CleanOperator, isValidCleanOperator } from "./constants";
 import type { FilterRule } from "./types";
 
 /**
- * Converts a filter rule into a URL-safe string format
- * Format: fieldType:field:operator:value
- *
- * @param filter - The filter rule to convert
- * @returns URL-safe string representation
- *
- * @example
- * const filter = { fieldType: "base", field: "price", operator: "gt", value: "100" }
- * // Returns: "base:price:gt:100"
+ * Utility class for handling filter rule conversions and URL parameter management
+ * Provides methods to convert between FilterRule objects, URL strings, and ProductQuery filters
  */
-export function filterToString(filter: FilterRule): string {
-  const { fieldType, field, operator, value } = filter;
+export class FilterSearchParams {
+  private readonly defaultParamName = "filter";
 
-  // Encode each component to handle special characters in field names or values
-  const encodedFieldType = encodeURIComponent(fieldType);
-  const encodedField = encodeURIComponent(field);
-  const encodedOperator = encodeURIComponent(operator);
-  const encodedValue = encodeURIComponent(value);
+  /**
+   * Converts a filter rule into a URL-safe string format
+   * Format: fieldType:field:operator:value
+   */
+  filterToString = (filter: FilterRule): string => {
+    const { fieldType, field, operator, value } = filter;
+    const parts = [fieldType, field, operator, value].map(encodeURIComponent);
+    return parts.join(":");
+  };
 
-  return `${encodedFieldType}:${encodedField}:${encodedOperator}:${encodedValue}`;
-}
+  /**
+   * Converts multiple filter rules into an array of URL-safe strings
+   */
+  filtersToStrings = (filters: FilterRule[]): string[] => {
+    return filters.map((filter) => this.filterToString(filter));
+  };
 
-/**
- * Converts multiple filter rules into an array of URL-safe strings
- *
- * @param filters - Array of filter rules to convert
- * @returns Array of URL-safe string representations
- */
-export function filtersToStrings(filters: FilterRule[]): string[] {
-  return filters.map(filterToString);
-}
+  /**
+   * Parses a URL-safe filter string back into a FilterRule object
+   */
+  stringToFilter = (filterString: string): FilterRule | null => {
+    try {
+      const parts = filterString.split(":");
+      if (parts.length !== 4) return null;
 
-/**
- * Parses a URL-safe filter string back into a FilterRule object
- *
- * @param filterString - The URL-safe string to parse
- * @returns Parsed FilterRule object or null if invalid
- *
- * @example
- * const str = "base:price:gt:100"
- * // Returns: { fieldType: "base", field: "price", operator: "gt", value: "100", id: "generated-id" }
- */
-export function stringToFilter(filterString: string): FilterRule | null {
-  try {
-    const parts = filterString.split(":");
+      const [fieldType, field, operator, value] = parts.map(decodeURIComponent);
 
-    // Must have exactly 4 parts: fieldType:field:operator:value
-    if (parts.length !== 4) {
+      if (!this.isValidFilterComponents(fieldType, operator)) return null;
+
+      return {
+        id: this.generateFilterId(fieldType, field, operator),
+        fieldType: fieldType as "base" | "attribute",
+        field,
+        operator: operator as CleanOperator,
+        value,
+      };
+    } catch (error) {
       return null;
     }
+  };
 
-    const [fieldType, field, operator, value] = parts.map(decodeURIComponent);
+  /**
+   * Parses multiple URL-safe filter strings back into FilterRule objects
+   */
+  stringsToFilters = (filterStrings: string[]): FilterRule[] => {
+    return filterStrings
+      .map((str) => this.stringToFilter(str))
+      .filter((filter): filter is FilterRule => filter !== null);
+  };
 
-    // Validate fieldType
-    if (fieldType !== "base" && fieldType !== "attribute") {
-      return null;
+  /**
+   * Converts filters to URL search params format
+   */
+  filtersToSearchParams = (
+    filters: FilterRule[],
+    paramName: string = this.defaultParamName,
+  ): URLSearchParams => {
+    const params = new URLSearchParams();
+    const filterStrings = this.filtersToStrings(filters);
+    filterStrings.forEach((filterString) => {
+      params.append(paramName, filterString);
+    });
+    return params;
+  };
+
+  /**
+   * Parses filters from URL search params
+   */
+  filtersFromSearchParams = (
+    searchParams: URLSearchParams | string | string[] | undefined | null,
+    paramName: string = this.defaultParamName,
+  ): FilterRule[] => {
+    const filterStrings = this.extractFilterStrings(searchParams, paramName);
+    return this.stringsToFilters(filterStrings);
+  };
+
+  /**
+   * Converts search params directly to ProductQuery filter object
+   */
+  searchParamsToProductQuery = (
+    searchParams: URLSearchParams | string | string[] | undefined | null,
+    paramName: string = this.defaultParamName,
+  ): NonNullable<ProductQuery["filter"]> => {
+    const filterStrings = this.extractFilterStrings(searchParams, paramName);
+    return this.buildProductQueryFromStrings(filterStrings);
+  };
+
+  /**
+   * Converts FilterRule objects directly to ProductQuery filter object
+   */
+  filterRulesToProductQuery = (
+    filterRules: FilterRule[],
+  ): NonNullable<ProductQuery["filter"]> => {
+    const result: NonNullable<ProductQuery["filter"]> = {};
+
+    filterRules.forEach((filterRule) => {
+      const { fieldType, field, operator, value } = filterRule;
+      const filterValue = this.buildFilterValue(operator, value);
+      this.applyFilterToResult(result, fieldType, field, filterValue);
+    });
+
+    return result;
+  };
+
+  // === Private Helper Methods ===
+
+  /**
+   * Extracts filter strings from various search param formats
+   */
+  private extractFilterStrings = (
+    searchParams: URLSearchParams | string | string[] | undefined | null,
+    paramName: string,
+  ): string[] => {
+    if (!searchParams) return [];
+
+    if (Array.isArray(searchParams)) {
+      return searchParams;
     }
 
-    // Validate operator - ensure it's a valid CleanOperator
-    if (!isValidCleanOperator(operator)) {
-      return null;
+    if (typeof searchParams === "string") {
+      // Direct filter value (contains colons but no = sign)
+      if (searchParams.includes(":") && !searchParams.includes("=")) {
+        return [decodeURIComponent(searchParams)];
+      }
+      // Query string format
+      const params = new URLSearchParams(searchParams);
+      return params.getAll(paramName);
     }
 
-    // Generate a unique ID for the filter
-    const id = `${fieldType}-${field}-${operator}-${Date.now()}`;
+    return searchParams.getAll(paramName);
+  };
 
-    return {
-      id,
-      fieldType: fieldType as "base" | "attribute",
-      field,
-      operator: operator as CleanOperator,
-      value,
-    };
-  } catch (error) {
-    // Handle any decoding errors
-    return null;
-  }
-}
+  /**
+   * Validates filter components (fieldType and operator)
+   */
+  private isValidFilterComponents = (
+    fieldType: string,
+    operator: string,
+  ): boolean => {
+    const isValidFieldType = fieldType === "base" || fieldType === "attribute";
+    return isValidFieldType && isValidCleanOperator(operator);
+  };
 
-/**
- * Parses multiple URL-safe filter strings back into FilterRule objects
- *
- * @param filterStrings - Array of URL-safe strings to parse
- * @returns Array of parsed FilterRule objects (invalid filters are filtered out)
- */
-export function stringsToFilters(filterStrings: string[]): FilterRule[] {
-  return filterStrings
-    .map(stringToFilter)
-    .filter((filter): filter is FilterRule => filter !== null);
-}
+  /**
+   * Generates a unique ID for a filter rule
+   */
+  private generateFilterId = (
+    fieldType: string,
+    field: string,
+    operator: string,
+  ): string => {
+    return `${fieldType}-${field}-${operator}-${Date.now()}`;
+  };
 
-/**
- * Converts filters to URL search params format
- *
- * @param filters - Array of filter rules
- * @param paramName - Name of the URL parameter (default: "filters")
- * @returns URLSearchParams object ready for use in URLs
- *
- * @example
- * const filters = [
- *   { fieldType: "base", field: "price", operator: "gt", value: "100" },
- *   { fieldType: "attribute", field: "color", operator: "eq", value: "red" }
- * ];
- * const params = filtersToSearchParams(filters);
- * // URL will look like: ?filters=base%3Aprice%3Agt%3A100&filters=attribute%3Acolor%3Aeq%3Ared
- */
-export function filtersToSearchParams(
-  filters: FilterRule[],
-  paramName: string = "filters",
-): URLSearchParams {
-  const params = new URLSearchParams();
+  /**
+   * Builds ProductQuery filter object from filter strings
+   */
+  private buildProductQueryFromStrings = (
+    filterStrings: string[],
+  ): NonNullable<ProductQuery["filter"]> => {
+    const result: NonNullable<ProductQuery["filter"]> = {};
 
-  const filterStrings = filtersToStrings(filters);
-  filterStrings.forEach((filterString) => {
-    params.append(paramName, filterString);
-  });
+    filterStrings.forEach((filterString) => {
+      const parts = filterString.split(":");
+      if (parts.length !== 4) return;
 
-  return params;
-}
+      const [fieldType, field, operator, value] = parts.map(decodeURIComponent);
+      if (!this.isValidFilterComponents(fieldType, operator)) return;
 
-/**
- * Parses filters from URL search params
- *
- * @param searchParams - URLSearchParams object, string, or undefined/null
- * @param paramName - Name of the URL parameter (default: "filters")
- * @returns Array of parsed FilterRule objects
- */
-export function filtersFromSearchParams(
-  searchParams: URLSearchParams | string | undefined | null,
-  paramName: string = "filters",
-): FilterRule[] {
-  // Handle undefined/null cases
-  if (!searchParams) {
-    return [];
-  }
+      const filterValue = this.buildFilterValue(
+        operator as CleanOperator,
+        value,
+      );
+      this.applyFilterToResult(result, fieldType, field, filterValue);
+    });
 
-  const params =
-    typeof searchParams === "string"
-      ? new URLSearchParams(searchParams)
-      : searchParams;
+    return result;
+  };
 
-  const filterStrings = params.getAll(paramName);
-  return stringsToFilters(filterStrings);
-}
+  /**
+   * Creates a filter value object with the appropriate operator prefix
+   */
+  private buildFilterValue = (
+    operator: CleanOperator,
+    value: string,
+  ): InternalFilterValue => {
+    const convertedValue = this.convertValue(value, operator);
+    return { [`$${operator}`]: convertedValue };
+  };
 
-/**
- * Converts search params directly to ProductQuery filter object
- * Parses filter strings and builds the query structure in one pass
- *
- * @param searchParams - URL search params string or URLSearchParams object
- * @param paramName - Name of the filter parameter (default: "filters")
- * @returns ProductQuery filter object ready for API calls
- *
- * @example
- * const query = searchParamsToProductQuery("?filters=base:id:eq:123&filters=attribute:color:regex:^red");
- * // Returns: { id: { eq: "123" }, attributes: { color: { regex: "^red" } } }
- */
-export function searchParamsToProductQuery(
-  searchParams: URLSearchParams | string | undefined | null,
-  paramName: string = "filters",
-): NonNullable<ProductQuery["filter"]> {
-  if (!searchParams) return {};
-
-  const params =
-    typeof searchParams === "string"
-      ? new URLSearchParams(searchParams)
-      : searchParams;
-
-  const result: NonNullable<ProductQuery["filter"]> = {};
-
-  params.getAll(paramName).forEach((filterString) => {
-    const parts = filterString.split(":");
-    if (parts.length !== 4) return;
-
-    const [fieldType, field, operator, value] = parts.map(decodeURIComponent);
-    if (fieldType !== "base" && fieldType !== "attribute") return;
-
-    // Convert value based on operator
-    const convertedValue = convertValue(value, operator as CleanOperator);
-    const filterValue = { [operator]: convertedValue };
-
+  /**
+   * Applies a filter value to the result object based on field type
+   */
+  private applyFilterToResult = (
+    result: NonNullable<ProductQuery["filter"]>,
+    fieldType: string,
+    field: string,
+    filterValue: InternalFilterValue,
+  ): void => {
     if (fieldType === "base") {
-      // Type-safe assignment for base fields
       const baseResult = result as Record<string, InternalFilterValue>;
       baseResult[field] = filterValue;
-    } else {
+    } else if (fieldType === "attribute") {
       result.attributes = result.attributes || {};
       result.attributes[field] = filterValue;
     }
-  });
+  };
 
-  return result;
+  /**
+   * Converts string value to appropriate type based on operator
+   */
+  private convertValue = (
+    value: string,
+    operator: CleanOperator,
+  ):
+    | string
+    | number
+    | boolean
+    | null
+    | (string | number | boolean | null)[] => {
+    switch (operator) {
+      case "gt":
+      case "gte":
+      case "lt":
+      case "lte":
+        return this.convertNumericValue(value);
+
+      case "in":
+        return this.convertArrayValue(value);
+
+      case "exists":
+        return value.toLowerCase() === "true";
+
+      case "eq":
+      case "ne":
+        return this.convertPrimitiveValue(value);
+
+      case "regex":
+        return value;
+
+      default:
+        return value;
+    }
+  };
+
+  /**
+   * Converts string to number if possible, otherwise returns original string
+   */
+  private convertNumericValue = (value: string): string | number => {
+    const numValue = parseFloat(value);
+    return isNaN(numValue) ? value : numValue;
+  };
+
+  /**
+   * Converts comma-separated string to array of properly typed values
+   */
+  private convertArrayValue = (
+    value: string,
+  ): (string | number | boolean | null)[] => {
+    return value.split(",").map((v) => this.convertPrimitiveValue(v.trim()));
+  };
+
+  /**
+   * Converts string to primitive value (string, number, boolean, or null)
+   */
+  private convertPrimitiveValue = (
+    value: string,
+  ): string | number | boolean | null => {
+    const lower = value.toLowerCase();
+
+    if (lower === "true") return true;
+    if (lower === "false") return false;
+    if (lower === "null") return null;
+
+    const parsed = parseFloat(value);
+    return isNaN(parsed) ? value : parsed;
+  };
 }
 
-/**
- * Converts string value to appropriate type based on operator
- * Supports all clean operators: eq, ne, gt, gte, lt, lte, in, exists, regex
- */
-function convertValue(
-  value: string,
-  operator: CleanOperator,
-): string | number | boolean | null | (string | number | boolean | null)[] {
-  switch (operator) {
-    case "gt":
-    case "gte":
-    case "lt":
-    case "lte":
-      // Numeric operators - convert to number
-      const numValue = parseFloat(value);
-      return isNaN(numValue) ? value : numValue;
+// Create a singleton instance for convenient usage
+export const filterSearchParams = new FilterSearchParams();
 
-    case "in":
-      // Array operator - split by comma and convert each item
-      return value.split(",").map((v) => {
-        const trimmed = v.trim();
-        const num = parseFloat(trimmed);
-        // Handle boolean values in arrays
-        if (trimmed.toLowerCase() === "true") return true;
-        if (trimmed.toLowerCase() === "false") return false;
-        if (trimmed.toLowerCase() === "null") return null;
-        return isNaN(num) ? trimmed : num;
-      });
-
-    case "exists":
-      // Boolean operator
-      return value.toLowerCase() === "true";
-
-    case "eq":
-    case "ne":
-      // Can be string, number, boolean, or null
-      if (value.toLowerCase() === "true") return true;
-      if (value.toLowerCase() === "false") return false;
-      if (value.toLowerCase() === "null") return null;
-      const parsed = parseFloat(value);
-      return isNaN(parsed) ? value : parsed;
-
-    case "regex":
-      // String operator for regex patterns
-      return value;
-
-    default:
-      // Fallback for any future operators
-      return value;
-  }
-}
+// Export individual methods with proper binding for backward compatibility
+export const filterToString = filterSearchParams.filterToString;
+export const filtersToStrings = filterSearchParams.filtersToStrings;
+export const stringToFilter = filterSearchParams.stringToFilter;
+export const stringsToFilters = filterSearchParams.stringsToFilters;
+export const filtersToSearchParams = filterSearchParams.filtersToSearchParams;
+export const filtersFromSearchParams =
+  filterSearchParams.filtersFromSearchParams;
+export const searchParamsToProductQuery =
+  filterSearchParams.searchParamsToProductQuery;
+export const filterRulesToProductQuery =
+  filterSearchParams.filterRulesToProductQuery;
