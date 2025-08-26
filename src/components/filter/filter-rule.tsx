@@ -3,10 +3,9 @@ import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Input } from "../ui/input";
 import { SupplierAttribute } from "@/app/types/attribute";
-import { OPERATORS } from "./constants";
+import { OPERATORS, CleanOperator } from "./constants";
 import { FilterRule } from "./types";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { InternalFilterValue } from "@/app/types/query-engine/common";
 import { cn } from "@/lib/utils";
 import { FILTER_FIELD_OPTIONS } from "./constants";
 import { getAvailableFieldOptions, getAvailableAttributes } from "./utils";
@@ -80,7 +79,6 @@ function FilterRuleComponent({
     return filtered;
   }, [usedFieldKeys, rule.field]);
 
-  // Memoize available options to prevent unnecessary recalculations during selection flow
   const availableFieldOptions = useMemo(
     () => getAvailableFieldOptions(usedFieldKeysExcludingCurrent),
     [usedFieldKeysExcludingCurrent],
@@ -96,7 +94,6 @@ function FilterRuleComponent({
     (option) => option.value === rule.field,
   );
 
-  // Find the selected operator
   const selectedOperator = OPERATORS.find((op) => op.value === rule.operator);
 
   /**
@@ -135,7 +132,7 @@ function FilterRuleComponent({
           field: "attributes",
           displayName: "Attributes",
           value: "",
-          operator: "$eq", // Default to equals
+          operator: "eq", // Default to equals (clean operator)
         },
         "attribute",
         attributeButtonRef as React.RefObject<HTMLElement>,
@@ -147,7 +144,7 @@ function FilterRuleComponent({
           field: option.value,
           displayName: option.label,
           value: "",
-          operator: "$eq", // Default to equals
+          operator: "eq", // Default to equals (clean operator)
         },
         "operator", // Show operator dropdown (with default selected)
         operatorButtonRef as React.RefObject<HTMLElement>,
@@ -165,7 +162,7 @@ function FilterRuleComponent({
         field: attribute.key,
         displayName: attribute.name,
         value: "",
-        operator: "$eq", // Default to equals
+        operator: "eq", // Default to equals (clean operator)
       },
       "operator", // Show operator dropdown (with default selected)
       operatorButtonRef as React.RefObject<HTMLElement>,
@@ -175,7 +172,7 @@ function FilterRuleComponent({
   /**
    * Handles operator selection and updates the rule
    */
-  const handleOperatorSelect = (operatorValue: keyof InternalFilterValue) => {
+  const handleOperatorSelect = (operatorValue: CleanOperator) => {
     handleSelection(
       { operator: operatorValue },
       null,

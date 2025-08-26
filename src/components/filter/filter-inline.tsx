@@ -39,7 +39,7 @@ export function InlineFilter({
       id: Date.now().toString(),
       fieldType: "base",
       field: "",
-      operator: "$eq",
+      operator: "eq", // Default to equals (clean operator)
       value: "",
       displayName: "",
     };

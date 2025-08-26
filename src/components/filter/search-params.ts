@@ -1,5 +1,6 @@
-import type { ProductQuery } from "@/app/types/query-engine/product";
 import type { InternalFilterValue } from "@/app/types/query-engine/common";
+import type { ProductQuery } from "@/app/types/query-engine/product";
+import { CleanOperator, isValidCleanOperator } from "./constants";
 import type { FilterRule } from "./types";
 
 /**
@@ -10,8 +11,8 @@ import type { FilterRule } from "./types";
  * @returns URL-safe string representation
  *
  * @example
- * const filter = { fieldType: "base", field: "price", operator: "$gt", value: "100" }
- * // Returns: "base:price:$gt:100"
+ * const filter = { fieldType: "base", field: "price", operator: "gt", value: "100" }
+ * // Returns: "base:price:gt:100"
  */
 export function filterToString(filter: FilterRule): string {
   const { fieldType, field, operator, value } = filter;
@@ -42,8 +43,8 @@ export function filtersToStrings(filters: FilterRule[]): string[] {
  * @returns Parsed FilterRule object or null if invalid
  *
  * @example
- * const str = "base:price:$gt:100"
- * // Returns: { fieldType: "base", field: "price", operator: "$gt", value: "100", id: "generated-id" }
+ * const str = "base:price:gt:100"
+ * // Returns: { fieldType: "base", field: "price", operator: "gt", value: "100", id: "generated-id" }
  */
 export function stringToFilter(filterString: string): FilterRule | null {
   try {
@@ -61,20 +62,8 @@ export function stringToFilter(filterString: string): FilterRule | null {
       return null;
     }
 
-    // Validate operator - ensure it's a valid InternalFilterValue key
-    const validOperators: (keyof InternalFilterValue)[] = [
-      "$eq",
-      "$ne",
-      "$gt",
-      "$gte",
-      "$lt",
-      "$lte",
-      "$in",
-      "$exists",
-      "$regex",
-    ];
-
-    if (!validOperators.includes(operator as keyof InternalFilterValue)) {
+    // Validate operator - ensure it's a valid CleanOperator
+    if (!isValidCleanOperator(operator)) {
       return null;
     }
 
@@ -85,7 +74,7 @@ export function stringToFilter(filterString: string): FilterRule | null {
       id,
       fieldType: fieldType as "base" | "attribute",
       field,
-      operator: operator as keyof InternalFilterValue,
+      operator: operator as CleanOperator,
       value,
     };
   } catch (error) {
@@ -115,11 +104,11 @@ export function stringsToFilters(filterStrings: string[]): FilterRule[] {
  *
  * @example
  * const filters = [
- *   { fieldType: "base", field: "price", operator: "$gt", value: "100" },
- *   { fieldType: "attribute", field: "color", operator: "$eq", value: "red" }
+ *   { fieldType: "base", field: "price", operator: "gt", value: "100" },
+ *   { fieldType: "attribute", field: "color", operator: "eq", value: "red" }
  * ];
  * const params = filtersToSearchParams(filters);
- * // URL will look like: ?filters=base%3Aprice%3A%24gt%3A100&filters=attribute%3Acolor%3A%24eq%3Ared
+ * // URL will look like: ?filters=base%3Aprice%3Agt%3A100&filters=attribute%3Acolor%3Aeq%3Ared
  */
 export function filtersToSearchParams(
   filters: FilterRule[],
@@ -169,8 +158,8 @@ export function filtersFromSearchParams(
  * @returns ProductQuery filter object ready for API calls
  *
  * @example
- * const query = searchParamsToProductQuery("?filters=base:id:$eq:123&filters=attribute:color:$regex:^red");
- * // Returns: { id: { $eq: "123" }, attributes: { color: { $regex: "^red" } } }
+ * const query = searchParamsToProductQuery("?filters=base:id:eq:123&filters=attribute:color:regex:^red");
+ * // Returns: { id: { eq: "123" }, attributes: { color: { regex: "^red" } } }
  */
 export function searchParamsToProductQuery(
   searchParams: URLSearchParams | string | undefined | null,
@@ -193,7 +182,7 @@ export function searchParamsToProductQuery(
     if (fieldType !== "base" && fieldType !== "attribute") return;
 
     // Convert value based on operator
-    const convertedValue = convertValue(value, operator);
+    const convertedValue = convertValue(value, operator as CleanOperator);
     const filterValue = { [operator]: convertedValue };
 
     if (fieldType === "base") {
@@ -211,22 +200,22 @@ export function searchParamsToProductQuery(
 
 /**
  * Converts string value to appropriate type based on operator
- * Supports all InternalFilterValue operators: $eq, $ne, $gt, $gte, $lt, $lte, $in, $exists, $regex
+ * Supports all clean operators: eq, ne, gt, gte, lt, lte, in, exists, regex
  */
 function convertValue(
   value: string,
-  operator: string,
+  operator: CleanOperator,
 ): string | number | boolean | null | (string | number | boolean | null)[] {
   switch (operator) {
-    case "$gt":
-    case "$gte":
-    case "$lt":
-    case "$lte":
+    case "gt":
+    case "gte":
+    case "lt":
+    case "lte":
       // Numeric operators - convert to number
       const numValue = parseFloat(value);
       return isNaN(numValue) ? value : numValue;
 
-    case "$in":
+    case "in":
       // Array operator - split by comma and convert each item
       return value.split(",").map((v) => {
         const trimmed = v.trim();
@@ -238,12 +227,12 @@ function convertValue(
         return isNaN(num) ? trimmed : num;
       });
 
-    case "$exists":
+    case "exists":
       // Boolean operator
       return value.toLowerCase() === "true";
 
-    case "$eq":
-    case "$ne":
+    case "eq":
+    case "ne":
       // Can be string, number, boolean, or null
       if (value.toLowerCase() === "true") return true;
       if (value.toLowerCase() === "false") return false;
@@ -251,7 +240,7 @@ function convertValue(
       const parsed = parseFloat(value);
       return isNaN(parsed) ? value : parsed;
 
-    case "$regex":
+    case "regex":
       // String operator for regex patterns
       return value;
 

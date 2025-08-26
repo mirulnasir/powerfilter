@@ -1,4 +1,4 @@
-import { InternalFilterValue } from "@/app/types/query-engine/common";
+import { CleanOperator } from "./constants";
 import { ProductQuery } from "@/app/types/query-engine/product";
 
 /**
@@ -9,13 +9,13 @@ export type FilterState = NonNullable<ProductQuery["filter"]>;
 
 /**
  * UI representation of a single filter for editing
- * Used internally by components, then converted to FilterState
+ * Uses clean operators without dollar signs for better UX
  */
 export interface FilterRule {
   id: string; // UI-only ID for React keys
   fieldType: "base" | "attribute";
   field: string; // Base field name or attribute key
-  operator: keyof InternalFilterValue;
+  operator: CleanOperator; // Clean operator without dollar sign
   value: string;
   displayName?: string; // For UI display
 }
