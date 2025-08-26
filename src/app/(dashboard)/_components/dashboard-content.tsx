@@ -17,6 +17,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { useRouter, useSearchParams } from "next/navigation";
 import { DataTable } from "./table";
 import { columns } from "./table/columns";
+import { DataTablePagination } from "./table/data-table-pagination";
 
 interface DashboardContentProps {
   attributes: SupplierAttribute[];
@@ -81,6 +82,21 @@ export function DashboardContent({
     router.push(`?${newSearchParams.toString()}`);
   };
 
+  const handlePageSizeChange = (pageSize: number) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+
+    newSearchParams.set("pageSize", pageSize.toString());
+
+    router.push(`?${newSearchParams.toString()}`);
+  };
+
+  const handlePageIndexChange = (pageIndex: number) => {
+    const newSearchParams = new URLSearchParams(searchParams);
+
+    newSearchParams.set("pageIndex", pageIndex.toString());
+
+    router.push(`?${newSearchParams.toString()}`);
+  };
   return (
     <div className="flex flex-col h-full">
       <div className="grow-0 shrink-0 ">
@@ -97,6 +113,15 @@ export function DashboardContent({
           sort={currentSort}
           onSortChange={handleSortChange}
           isLoading={isLoading}
+        />
+      </div>
+      <div className="grow-0 shrink-0 py-2 border-t">
+        <DataTablePagination
+          totalResults={productsData?.total ?? 0}
+          pageSize={productsData?.pagination.limit ?? 0}
+          pageIndex={productsData?.pagination.offset ?? 0}
+          onPageSizeChange={handlePageSizeChange}
+          onPageIndexChange={handlePageIndexChange}
         />
       </div>
     </div>
