@@ -5,11 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import React, { useCallback, useState } from "react";
 import { FilterRuleComponent } from "./filter-rule";
-import { FilterRule, getValidFilterRules } from "./types";
+import { FilterRule } from "./types";
 
-/**
- * Props for the InlineFilter component
- */
 interface InlineFilterProps {
   attributes: SupplierAttribute[];
   onFilterChange: (rules: FilterRule[]) => void;
@@ -25,6 +22,9 @@ export function InlineFilter({
   onFilterChange,
 }: InlineFilterProps) {
   const [filterRules, setFilterRules] = useState<FilterRule[]>([]);
+  const [validationStates, setValidationStates] = useState<
+    Record<string, boolean>
+  >({});
   let ruleCounter = 0;
 
   /**
@@ -33,8 +33,8 @@ export function InlineFilter({
    */
   const addFilterRule = useCallback(() => {
     const newRule: FilterRule = {
-      id: `rule-${++ruleCounter}`, // baseId is removed, so use a simple counter
-      fieldType: "base", // Default type, but no field selected
+      id: `rule-${++ruleCounter}`,
+      fieldType: "base",
       field: "",
       operator: "$eq",
       value: "",
@@ -45,10 +45,15 @@ export function InlineFilter({
   }, []);
 
   /**
-   * Removes a filter rule by ID
+   * Removes a filter rule by ID and cleans up validation state
    */
   const removeFilterRule = useCallback((ruleId: string) => {
     setFilterRules((prev) => prev.filter((rule) => rule.id !== ruleId));
+    setValidationStates((prev) => {
+      const newStates = { ...prev };
+      delete newStates[ruleId];
+      return newStates;
+    });
   }, []);
 
   /**
@@ -66,21 +71,32 @@ export function InlineFilter({
   );
 
   /**
+   * Handles validation state changes from individual rules
+   */
+  const handleValidationChange = useCallback(
+    (ruleId: string, isValid: boolean) => {
+      setValidationStates((prev) => ({ ...prev, [ruleId]: isValid }));
+    },
+    [],
+  );
+
+  /**
    * Notifies parent component of filter changes whenever rules are updated
    * Only sends valid/complete rules to prevent filtering with incomplete data
    */
   const notifyFilterChange = useCallback(() => {
-    const validRules = getValidFilterRules(filterRules);
+    const validRules = filterRules.filter((rule) => validationStates[rule.id]);
     onFilterChange(validRules);
-  }, [filterRules, onFilterChange]);
+  }, [filterRules, validationStates, onFilterChange]);
 
-  // Auto-apply filters when rules change
+  // Auto-apply filters when rules or validation states change
   React.useEffect(() => {
     notifyFilterChange();
   }, [notifyFilterChange]);
 
   // Get counts for display
-  const validRulesCount = getValidFilterRules(filterRules).length;
+  const validRulesCount =
+    Object.values(validationStates).filter(Boolean).length;
   const totalRulesCount = filterRules.length;
 
   return (
@@ -93,6 +109,7 @@ export function InlineFilter({
           attributes={attributes}
           onUpdate={updateFilterRule}
           onRemove={removeFilterRule}
+          onValidationChange={handleValidationChange}
         />
       ))}
 

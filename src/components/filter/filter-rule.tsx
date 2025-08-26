@@ -5,7 +5,9 @@ import { Input } from "../ui/input";
 import { SupplierAttribute } from "@/app/types/attribute";
 import { OPERATORS } from "./constants";
 import { FilterRule } from "./types";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { InternalFilterValue } from "@/app/types/query-engine/common";
+import { cn } from "@/lib/utils";
 
 /**
  * Props for individual filter rule component
@@ -15,6 +17,7 @@ interface FilterRuleProps {
   attributes: SupplierAttribute[];
   onUpdate: (ruleId: string, updates: Partial<FilterRule>) => void;
   onRemove: (ruleId: string) => void;
+  onValidationChange: (ruleId: string, isValid: boolean) => void;
 }
 
 // Available field options (base fields + attributes option)
@@ -26,16 +29,34 @@ const fieldOptions = [
 ];
 
 /**
+ * Validates if a filter rule is complete and ready to be applied
+ * A rule is valid if:
+ * - Has a field selected (not empty and not "attributes" placeholder)
+ * - Has an operator selected
+ * - Has a non-empty value
+ */
+function isValidFilterRule(rule: FilterRule): boolean {
+  return !!(
+    rule.field &&
+    rule.field !== "attributes" &&
+    rule.operator &&
+    rule.value.trim()
+  );
+}
+
+/**
  * Individual filter rule component with conditional attribute selection and auto-focus management
  * - First dropdown: Base fields + "attributes" option
  * - Second dropdown: Appears only when "attributes" is selected
  * - Auto-focuses and opens next dropdown/input after each selection
+ * - Validates rule completeness and notifies parent of validation state changes
  */
 function FilterRuleComponent({
   rule,
   attributes,
   onUpdate,
   onRemove,
+  onValidationChange,
 }: FilterRuleProps) {
   const [openPopover, setOpenPopover] = useState<
     "field" | "attribute" | "operator" | null
@@ -46,6 +67,14 @@ function FilterRuleComponent({
   const attributeButtonRef = useRef<HTMLButtonElement>(null);
   const operatorButtonRef = useRef<HTMLButtonElement>(null);
   const valueInputRef = useRef<HTMLInputElement>(null);
+
+  // Memoized validation status
+  const isValid = useMemo(() => isValidFilterRule(rule), [rule]);
+
+  // Notify parent when validation status changes
+  useEffect(() => {
+    onValidationChange(rule.id, isValid);
+  }, [rule.id, isValid, onValidationChange]);
 
   // Find the currently selected field option
   const selectedFieldOption = fieldOptions.find(
@@ -137,7 +166,7 @@ function FilterRuleComponent({
   /**
    * Handles operator selection and updates the rule
    */
-  const handleOperatorSelect = (operatorValue: string) => {
+  const handleOperatorSelect = (operatorValue: keyof InternalFilterValue) => {
     handleSelection(
       { operator: operatorValue },
       null,
@@ -171,11 +200,12 @@ function FilterRuleComponent({
 
   return (
     <div
-      className={`flex items-center gap-x-2 p-3 rounded-md border ${
-        rule.operator === "$eq"
+      className={cn(
+        "flex items-center gap-x-2 p-3 rounded-md border",
+        isValid
           ? "bg-muted/30 border-border"
-          : "bg-muted/10 border-muted-foreground/20 border-dashed"
-      }`}
+          : "bg-muted/10 border-muted-foreground/20 border-dashed",
+      )}
     >
       {/* Field Selection Popover */}
       <Popover
@@ -255,7 +285,7 @@ function FilterRuleComponent({
           <Button
             ref={operatorButtonRef}
             variant="outline"
-            className="w-24 justify-between"
+            className="w-24 justify-between items-center"
           >
             <span className="truncate font-mono">
               {selectedOperator?.symbol || "="}
