@@ -31,14 +31,13 @@ export function InlineFilter({
 
   /**
    * Adds a new filter rule to the end of the list
-   * Starts with empty/unselected state for better UX
    */
   const addFilterRule = useCallback(() => {
     const newRule: FilterRule = {
       id: Date.now().toString(),
       fieldType: "base",
       field: "",
-      operator: "eq", // Default to equals (clean operator)
+      operator: "eq",
       value: "",
       displayName: "",
     };
@@ -126,12 +125,7 @@ export function InlineFilter({
     onFilterChange([]);
   }, [onFilterChange]);
 
-  // Get counts for display
-  const validRulesCount =
-    Object.values(validationStates).filter(Boolean).length;
-  const invalidRulesCount = filterRules.length - validRulesCount;
   const totalRulesCount = filterRules.length;
-  const hasInvalidRules = invalidRulesCount > 0;
 
   return (
     <div className={`flex gap-x-2 gap-y-1 flex-wrap  items-center`}>
@@ -175,7 +169,7 @@ export function InlineFilter({
       )}
 
       {/* Filter Status */}
-      {totalRulesCount > 0 && (
+      {/* {totalRulesCount > 0 && (
         <div className="text-xs text-muted-foreground max-w-36">
           {validRulesCount} of {totalRulesCount} filter rule
           {totalRulesCount !== 1 ? "s" : ""}{" "}
@@ -186,7 +180,7 @@ export function InlineFilter({
             </span>
           )}
         </div>
-      )}
+      )} */}
     </div>
   );
 }

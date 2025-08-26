@@ -86,9 +86,9 @@ const SortableHeader = ({
     }
 
     return currentOrder === "ASC" ? (
-      <ArrowUpWideNarrow className="   h-4 w-4 text-teal-600" />
+      <ArrowUpWideNarrow className="   h-4 w-4 text-primary " />
     ) : (
-      <ArrowDownNarrowWide className=" h-4 w-4 text-teal-600" />
+      <ArrowDownNarrowWide className=" h-4 w-4 text-primary " />
     );
   };
 
@@ -98,7 +98,7 @@ const SortableHeader = ({
       onClick={handleSort}
       className={cn(
         "h-full p-0 hover:bg-transparent font-medium rounded-none",
-        isCurrentSort && "border-b-2  border-teal-600",
+        isCurrentSort && "border-b-2  border-primary",
       )}
     >
       {children}
