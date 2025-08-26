@@ -42,3 +42,11 @@ export const OPERATORS = [
     symbol: "∃",
   },
 ] as const;
+
+// Base field options for filtering
+export const BASE_FIELD_OPTIONS = [
+  { value: "skuId", label: "SKU ID", type: "base" as const },
+  { value: "updatedAt", label: "Updated At", type: "base" as const },
+  { value: "createdAt", label: "Created At", type: "base" as const },
+  { value: "attributes", label: "Attributes", type: "attribute" as const },
+];

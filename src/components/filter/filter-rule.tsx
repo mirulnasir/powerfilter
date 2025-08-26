@@ -8,6 +8,8 @@ import { FilterRule } from "./types";
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { InternalFilterValue } from "@/app/types/query-engine/common";
 import { cn } from "@/lib/utils";
+import { BASE_FIELD_OPTIONS } from "./constants";
+import { getAvailableFieldOptions, getAvailableAttributes } from "./utils";
 
 /**
  * Props for individual filter rule component
@@ -15,18 +17,11 @@ import { cn } from "@/lib/utils";
 interface FilterRuleProps {
   rule: FilterRule;
   attributes: SupplierAttribute[];
+  usedFieldKeys: Set<string>;
   onUpdate: (ruleId: string, updates: Partial<FilterRule>) => void;
   onRemove: (ruleId: string) => void;
   onValidationChange: (ruleId: string, isValid: boolean) => void;
 }
-
-// Available field options (base fields + attributes option)
-const fieldOptions = [
-  { value: "skuId", label: "SKU ID", type: "base" as const },
-  { value: "updatedAt", label: "Updated At", type: "base" as const },
-  { value: "createdAt", label: "Created At", type: "base" as const },
-  { value: "attributes", label: "Attributes", type: "attribute" as const },
-];
 
 /**
  * Validates if a filter rule is complete and ready to be applied
@@ -54,6 +49,7 @@ function isValidFilterRule(rule: FilterRule): boolean {
 function FilterRuleComponent({
   rule,
   attributes,
+  usedFieldKeys,
   onUpdate,
   onRemove,
   onValidationChange,
@@ -68,24 +64,37 @@ function FilterRuleComponent({
   const operatorButtonRef = useRef<HTMLButtonElement>(null);
   const valueInputRef = useRef<HTMLInputElement>(null);
 
-  // Memoized validation status
   const isValid = useMemo(() => isValidFilterRule(rule), [rule]);
 
-  // Notify parent when validation status changes
   useEffect(() => {
     onValidationChange(rule.id, isValid);
   }, [rule.id, isValid, onValidationChange]);
 
-  // Find the currently selected field option
-  const selectedFieldOption = fieldOptions.find(
-    (option) => option.value === rule.field,
+  // Create a version of usedFieldKeys that excludes the current rule's field
+  // This prevents the current rule from being filtered out during editing
+  const usedFieldKeysExcludingCurrent = useMemo(() => {
+    const filtered = new Set(usedFieldKeys);
+    if (rule.field && rule.field !== "attributes") {
+      filtered.delete(rule.field);
+    }
+    return filtered;
+  }, [usedFieldKeys, rule.field]);
+
+  // Memoize available options to prevent unnecessary recalculations during selection flow
+  const availableFieldOptions = useMemo(
+    () => getAvailableFieldOptions(usedFieldKeysExcludingCurrent),
+    [usedFieldKeysExcludingCurrent],
   );
 
-  // Find the selected attribute (if fieldType is "attribute")
-  const selectedAttribute =
-    rule.fieldType === "attribute" && rule.field !== "attributes"
-      ? attributes.find((attr) => attr.key === rule.field)
-      : null;
+  const availableAttributes = useMemo(
+    () => getAvailableAttributes(attributes, usedFieldKeysExcludingCurrent),
+    [attributes, usedFieldKeysExcludingCurrent],
+  );
+
+  // Find the currently selected field option (search in ALL options, not just available)
+  const selectedFieldOption = BASE_FIELD_OPTIONS.find(
+    (option) => option.value === rule.field,
+  );
 
   // Find the selected operator
   const selectedOperator = OPERATORS.find((op) => op.value === rule.operator);
@@ -118,7 +127,7 @@ function FilterRuleComponent({
   /**
    * Handles field selection and updates the rule
    */
-  const handleFieldSelect = (option: (typeof fieldOptions)[0]) => {
+  const handleFieldSelect = (option: (typeof availableFieldOptions)[0]) => {
     if (option.value === "attributes") {
       handleSelection(
         {
@@ -224,7 +233,7 @@ function FilterRuleComponent({
         </PopoverTrigger>
         <PopoverContent align="start" className="w-32 p-0">
           <div className="p-1">
-            {fieldOptions.map((option) => (
+            {availableFieldOptions.map((option) => (
               <button
                 key={option.value}
                 onClick={() => handleFieldSelect(option)}
@@ -249,26 +258,22 @@ function FilterRuleComponent({
               variant="outline"
               className="w-40 justify-between"
             >
-              <span className="truncate">
-                {selectedAttribute?.name || "Select attribute..."}
-              </span>
+              <span className="truncate">Select attribute...</span>
               <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="start" className="w-56 p-0">
-            <div className="p-1">
-              {attributes.map((attribute) => (
+          <PopoverContent align="start" className="w-48 p-0">
+            <div className="p-1 max-h-64 overflow-y-auto">
+              {availableAttributes.map((attribute) => (
                 <button
                   key={attribute.key}
                   onClick={() => handleAttributeSelect(attribute)}
                   className="w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none"
                 >
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{attribute.name}</span>
-                    <span className="text-xs text-muted-foreground">
-                      ({attribute.key})
-                    </span>
-                  </div>
+                  <span className="font-medium">{attribute.name}</span>
+                  <span className="text-xs text-muted-foreground block">
+                    {attribute.key}
+                  </span>
                 </button>
               ))}
             </div>

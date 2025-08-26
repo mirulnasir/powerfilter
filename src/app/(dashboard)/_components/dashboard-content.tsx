@@ -14,7 +14,7 @@ interface DashboardContentProps {
 }
 
 export function DashboardContent({ attributes }: DashboardContentProps) {
-  const { data: productsData } = useSuspenseQuery(initialProductsOptions);
+  const { data: productsData } = useSuspenseQuery(initialProductsOptions({}));
   const [data] = useState(productsData.data);
   const [filteredData, setFilteredData] = useState(productsData.data);
 

@@ -1,8 +1,12 @@
 import { getQueryClient } from "@/lib/react-query/get-query-client";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { initialProductsOptions } from "../services/products/getProducts";
 import { SupplierAttribute } from "../types/attribute";
 import { DashboardContent } from "./_components/dashboard-content";
-import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+import {
+  filtersFromSearchParams,
+  stringsToFilters,
+} from "@/components/filter/search-params";
 
 // async function getAttributes(): Promise<SupplierAttribute[]> {
 //   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -22,9 +26,16 @@ import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 //   }
 // }
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ filters: string }>;
+}) {
+  const filter = (await searchParams).filters;
+  console.log(filter);
+  const filterRules = filtersFromSearchParams(filter, "filters");
   const queryClient = getQueryClient();
-  void queryClient.prefetchQuery(initialProductsOptions);
+  void queryClient.prefetchQuery(initialProductsOptions({}));
 
   return (
     <main>

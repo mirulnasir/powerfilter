@@ -2,10 +2,11 @@
 
 import { SupplierAttribute } from "@/app/types/attribute";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import React, { useCallback, useState } from "react";
+import { Filter, Plus } from "lucide-react";
+import { useCallback, useState } from "react";
 import { FilterRuleComponent } from "./filter-rule";
 import { FilterRule } from "./types";
+import { getUsedFieldKeys } from "./utils";
 
 interface InlineFilterProps {
   attributes: SupplierAttribute[];
@@ -13,9 +14,9 @@ interface InlineFilterProps {
 }
 
 /**
- * Inline filter component that starts with a plus button and appends filter rule boxes
+ * Inline filter component that prevents duplicate field selection
  * Each rule box contains field selection (base fields + attributes), operator, and value inputs
- * Only complete/valid rules are passed to parent component
+ * Apply button sends only valid rules and removes invalid ones from the UI
  */
 export function InlineFilter({
   attributes,
@@ -25,7 +26,9 @@ export function InlineFilter({
   const [validationStates, setValidationStates] = useState<
     Record<string, boolean>
   >({});
-  let ruleCounter = 0;
+
+  // Get currently used field keys to prevent duplicates
+  const usedFieldKeys = getUsedFieldKeys(filterRules);
 
   /**
    * Adds a new filter rule to the end of the list
@@ -33,7 +36,7 @@ export function InlineFilter({
    */
   const addFilterRule = useCallback(() => {
     const newRule: FilterRule = {
-      id: `rule-${++ruleCounter}`,
+      id: Date.now().toString(),
       fieldType: "base",
       field: "",
       operator: "$eq",
@@ -81,23 +84,39 @@ export function InlineFilter({
   );
 
   /**
-   * Notifies parent component of filter changes whenever rules are updated
-   * Only sends valid/complete rules to prevent filtering with incomplete data
+   * Applies filters by removing invalid rules and notifying parent with valid ones
+   * This provides explicit control over when filters are applied
    */
-  const notifyFilterChange = useCallback(() => {
+  const applyFilters = useCallback(() => {
+    // Get valid rules
     const validRules = filterRules.filter((rule) => validationStates[rule.id]);
+
+    // Remove invalid rules from the UI
+    const invalidRuleIds = filterRules
+      .filter((rule) => !validationStates[rule.id])
+      .map((rule) => rule.id);
+
+    if (invalidRuleIds.length > 0) {
+      setFilterRules((prev) =>
+        prev.filter((rule) => validationStates[rule.id]),
+      );
+      setValidationStates((prev) => {
+        const newStates = { ...prev };
+        invalidRuleIds.forEach((id) => delete newStates[id]);
+        return newStates;
+      });
+    }
+
+    // Notify parent with valid rules
     onFilterChange(validRules);
   }, [filterRules, validationStates, onFilterChange]);
-
-  // Auto-apply filters when rules or validation states change
-  React.useEffect(() => {
-    notifyFilterChange();
-  }, [notifyFilterChange]);
 
   // Get counts for display
   const validRulesCount =
     Object.values(validationStates).filter(Boolean).length;
+  const invalidRulesCount = filterRules.length - validRulesCount;
   const totalRulesCount = filterRules.length;
+  const hasInvalidRules = invalidRulesCount > 0;
 
   return (
     <div className={`flex gap-x-2 gap-y-1 flex-wrap`}>
@@ -107,6 +126,7 @@ export function InlineFilter({
           key={rule.id}
           rule={rule}
           attributes={attributes}
+          usedFieldKeys={usedFieldKeys}
           onUpdate={updateFilterRule}
           onRemove={removeFilterRule}
           onValidationChange={handleValidationChange}
@@ -123,12 +143,29 @@ export function InlineFilter({
         Add Filter
       </Button>
 
+      {/* Apply Filter Button - only show when there are rules */}
+      {totalRulesCount > 0 && (
+        <Button
+          onClick={applyFilters}
+          className="h-14"
+          variant={hasInvalidRules ? "destructive" : "default"}
+        >
+          <Filter className="size-4" />
+          Apply Filter{hasInvalidRules ? " & Remove Invalid" : ""}
+        </Button>
+      )}
+
       {/* Filter Status */}
       {totalRulesCount > 0 && (
         <div className="text-sm text-muted-foreground">
           {validRulesCount} of {totalRulesCount} filter rule
           {totalRulesCount !== 1 ? "s" : ""}{" "}
-          {validRulesCount === 1 ? "is" : "are"} active
+          {validRulesCount === 1 ? "is" : "are"} valid
+          {hasInvalidRules && (
+            <span className="text-destructive ml-1">
+              ({invalidRulesCount} will be removed)
+            </span>
+          )}
         </div>
       )}
     </div>
