@@ -2,6 +2,7 @@ import type { InternalFilterValue } from "@/app/types/query-engine/common";
 import type { ProductQuery } from "@/app/types/query-engine/product";
 import { CleanOperator, isValidCleanOperator } from "./constants";
 import type { FilterRule } from "./types";
+import { InternalQuerySort } from "@/app/types/query-engine/common";
 
 /**
  * Utility class for handling filter rule conversions and URL parameter management
@@ -46,7 +47,7 @@ export class FilterSearchParams {
         operator: operator as CleanOperator,
         value,
       };
-    } catch (error) {
+    } catch {
       return null;
     }
   };
@@ -304,3 +305,31 @@ export const searchParamsToProductQuery =
   filterSearchParams.searchParamsToProductQuery;
 export const filterRulesToProductQuery =
   filterSearchParams.filterRulesToProductQuery;
+
+/**
+ * Converts sort search parameter to InternalQuerySort
+ * Format: "field:order" (e.g., "createdAt:DESC")
+ */
+export function sortFromSearchParams(
+  searchParams: string | string[] | undefined,
+): InternalQuerySort | undefined {
+  if (!searchParams || Array.isArray(searchParams)) return undefined;
+
+  const [field, order] = searchParams.split(":");
+  if (!field || !order || (order !== "ASC" && order !== "DESC")) {
+    return undefined;
+  }
+
+  return { field, order };
+}
+
+/**
+ * Converts InternalQuerySort to search parameter format
+ * Returns: "field:order" (e.g., "createdAt:DESC")
+ */
+export function sortToSearchParams(
+  sort: InternalQuerySort | undefined,
+): string | undefined {
+  if (!sort) return undefined;
+  return `${sort.field}:${sort.order}`;
+}

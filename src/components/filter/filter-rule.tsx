@@ -207,7 +207,7 @@ function FilterRuleComponent({
   return (
     <div
       className={cn(
-        "flex items-center gap-x-2 p-3 rounded-md border",
+        "flex items-center gap-x-2 px-3 py-1 rounded-md border",
         isValid
           ? "bg-muted/30 border-border"
           : "bg-muted/10 border-muted-foreground/20 border-dashed",
@@ -222,7 +222,7 @@ function FilterRuleComponent({
           <Button
             ref={fieldButtonRef}
             variant="outline"
-            className="w-32 justify-between"
+            className="w-32 justify-between h-full"
           >
             <span className="truncate">{getFieldDisplayText()}</span>
             <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -253,7 +253,7 @@ function FilterRuleComponent({
             <Button
               ref={attributeButtonRef}
               variant="outline"
-              className="w-36 justify-between"
+              className="w-36 justify-between  h-full"
             >
               <span className="truncate">Select attribute...</span>
               <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -287,7 +287,7 @@ function FilterRuleComponent({
           <Button
             ref={operatorButtonRef}
             variant="outline"
-            className="w-24 justify-between items-center"
+            className="w-24 justify-between items-center h-full"
           >
             <span className="truncate font-mono">
               {selectedOperator?.symbol || "="}
@@ -320,7 +320,7 @@ function FilterRuleComponent({
         value={rule.value}
         onChange={(e) => onUpdate(rule.id, { value: e.target.value })}
         onKeyDown={handleValueKeyDown}
-        className="flex-1"
+        className="flex-1 h-full"
       />
 
       {/* Remove Rule Button */}

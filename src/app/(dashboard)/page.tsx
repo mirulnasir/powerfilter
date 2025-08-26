@@ -1,4 +1,7 @@
-import { searchParamsToProductQuery } from "@/components/filter/search-params";
+import {
+  searchParamsToProductQuery,
+  sortFromSearchParams,
+} from "@/components/filter/search-params";
 import { getQueryClient } from "@/lib/react-query/get-query-client";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 import { initialProductsOptions } from "../services/products/getProducts";
@@ -26,15 +29,17 @@ import { DashboardContent } from "./_components/dashboard-content";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ filter: string | string[] }>;
+  searchParams: Promise<{ filter: string | string[]; sort: string | string[] }>;
 }) {
   const params = await searchParams;
 
   const queryClient = getQueryClient();
   const productQuery = searchParamsToProductQuery(params.filter, "filter");
+  const sort = sortFromSearchParams(params.sort);
   void queryClient.prefetchQuery(
     initialProductsOptions({
       filter: productQuery,
+      sort: sort,
     }),
   );
 

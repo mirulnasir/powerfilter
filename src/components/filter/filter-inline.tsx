@@ -53,14 +53,23 @@ export function InlineFilter({
   /**
    * Removes a filter rule by ID and cleans up validation state
    */
-  const removeFilterRule = useCallback((ruleId: string) => {
-    setFilterRules((prev) => prev.filter((rule) => rule.id !== ruleId));
-    setValidationStates((prev) => {
-      const newStates = { ...prev };
-      delete newStates[ruleId];
-      return newStates;
-    });
-  }, []);
+  const removeFilterRule = useCallback(
+    (ruleId: string) => {
+      const updatedRules = filterRules.filter((rule) => rule.id !== ruleId);
+      setFilterRules(updatedRules);
+      setValidationStates((prev) => {
+        const newStates = { ...prev };
+        delete newStates[ruleId];
+        return newStates;
+      });
+
+      // Notify parent if no rules remain
+      if (updatedRules.length === 0) {
+        onFilterChange([]);
+      }
+    },
+    [filterRules, onFilterChange],
+  );
 
   /**
    * Updates a specific filter rule
@@ -91,10 +100,8 @@ export function InlineFilter({
    * This provides explicit control over when filters are applied
    */
   const applyFilters = useCallback(() => {
-    // Get valid rules
     const validRules = filterRules.filter((rule) => validationStates[rule.id]);
 
-    // Remove invalid rules from the UI
     const invalidRuleIds = filterRules
       .filter((rule) => !validationStates[rule.id])
       .map((rule) => rule.id);
@@ -122,7 +129,7 @@ export function InlineFilter({
   const hasInvalidRules = invalidRulesCount > 0;
 
   return (
-    <div className={`flex gap-x-2 gap-y-1 flex-wrap`}>
+    <div className={`flex gap-x-2 gap-y-1 flex-wrap py-1`}>
       {/* Filter Rules */}
       {filterRules.map((rule) => (
         <FilterRuleComponent
@@ -140,7 +147,7 @@ export function InlineFilter({
       <Button
         variant="outline"
         onClick={addFilterRule}
-        className="h-14 border-dashed hover:border-solid"
+        className="h-12 border-dashed hover:border-solid"
       >
         <Plus className="size-4" />
         Add Filter
@@ -150,7 +157,7 @@ export function InlineFilter({
       {totalRulesCount > 0 && (
         <Button
           onClick={applyFilters}
-          className="h-14"
+          className="h-12"
           variant={hasInvalidRules ? "destructive" : "default"}
         >
           <Filter className="size-4" />
