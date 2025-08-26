@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import { FilterRuleComponent } from "./filter-rule";
 import { FilterRule } from "./types";
@@ -26,7 +26,6 @@ export function InlineFilter({
     Record<string, boolean>
   >({});
 
-  console.log({ filters, filterRules });
   // Get currently used field keys to prevent duplicates
   const usedFieldKeys = getUsedFieldKeys(filterRules);
 
@@ -113,10 +112,19 @@ export function InlineFilter({
         return newStates;
       });
     }
-    console.log("validRules", validRules);
     // Notify parent with valid rules
     onFilterChange(validRules);
   }, [filterRules, validationStates, onFilterChange]);
+
+  /**
+   * Clears all filter rules and resets state
+   * Notifies parent with empty array to clear filters
+   */
+  const clearAllFilters = useCallback(() => {
+    setFilterRules([]);
+    setValidationStates({});
+    onFilterChange([]);
+  }, [onFilterChange]);
 
   // Get counts for display
   const validRulesCount =
@@ -126,7 +134,7 @@ export function InlineFilter({
   const hasInvalidRules = invalidRulesCount > 0;
 
   return (
-    <div className={`flex gap-x-2 gap-y-1 flex-wrap py-2 px-2`}>
+    <div className={`flex gap-x-2 gap-y-1 flex-wrap py-2 px-2 items-center`}>
       {/* Filter Rules */}
       {filterRules.map((rule) => (
         <FilterRuleComponent
@@ -150,9 +158,20 @@ export function InlineFilter({
       </Button>
 
       {totalRulesCount > 0 && (
-        <Button onClick={applyFilters} className="h-12" variant={"default"}>
-          Apply Filter
-        </Button>
+        <>
+          <Button onClick={applyFilters} className="h-12" variant={"default"}>
+            Apply Filter
+          </Button>
+          <Button
+            onClick={clearAllFilters}
+            className="h-12"
+            variant={"ghost"}
+            size="sm"
+          >
+            <X className="size-4" />
+            Clear All
+          </Button>
+        </>
       )}
 
       {/* Filter Status */}

@@ -39,8 +39,6 @@ export function DashboardContent({ filterString }: DashboardContentProps) {
   const limitParam = searchParams.get("limit");
   const currentPagination = paginationFromSearchParams(pageParam, limitParam);
 
-  console.log({ filterRules, filterQuery, currentSort, currentPagination });
-
   const { data: productsData, isLoading } = useQuery(
     initialProductsOptions({
       filter: filterQuery,
@@ -54,8 +52,6 @@ export function DashboardContent({ filterString }: DashboardContentProps) {
    * This ensures the filter state is persisted in the URL for bookmarking and navigation
    */
   const handleFilterChange = async (rules: FilterRule[]) => {
-    console.log("handle Filter rules:", rules);
-
     const newSearchParams = new URLSearchParams(searchParams);
 
     newSearchParams.delete("filter");
