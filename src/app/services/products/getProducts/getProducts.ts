@@ -11,6 +11,7 @@ export const getProducts = async (
       method: "POST",
       body: JSON.stringify(query),
     });
+    console.log("response", response);
     if (!response.ok) {
       throw new Error(response.statusText);
     } else {
