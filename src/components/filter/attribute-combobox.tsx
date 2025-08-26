@@ -59,7 +59,6 @@ export function AttributeCombobox({
   const [attributes, setAttributes] = useState<SupplierAttribute[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Debounce search to avoid excessive API calls
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
 
   useEffect(() => {
@@ -70,10 +69,6 @@ export function AttributeCombobox({
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
 
-  /**
-   * Fetches attributes based on search query
-   * Filters by name and key, excludes already used attributes
-   */
   const fetchAttributes = useCallback(
     async (query: string) => {
       setIsLoading(true);
@@ -166,7 +161,7 @@ export function AttributeCombobox({
                   {attributes.map((attribute) => (
                     <CommandItem
                       key={attribute.key}
-                      value={`${attribute.name} ${attribute.key}`} // Include both for better search
+                      value={`${attribute.name} ${attribute.key}`}
                       onSelect={() => handleSelect(attribute)}
                     >
                       <div className=" truncate  ">
