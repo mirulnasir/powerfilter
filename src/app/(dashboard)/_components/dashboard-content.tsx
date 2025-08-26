@@ -19,6 +19,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { DataTable } from "./table";
 import { columns } from "./table/columns";
 import { DataTablePagination } from "./table/data-table-pagination";
+import { Button } from "@/components/ui/button";
+import { ClipboardIcon } from "lucide-react";
 
 interface DashboardContentProps {
   filterString: string | string[];
@@ -109,13 +111,23 @@ export function DashboardContent({ filterString }: DashboardContentProps) {
     Math.floor(
       (productsData?.pagination.offset ?? 0) / currentPagination.limit,
     ) + 1;
+
+  const handleCopyView = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url);
+  };
+
   return (
     <div className="flex flex-col h-full">
-      <div className="grow-0 shrink-0 ">
+      <div className="grow-0 shrink-0 flex gap-2 justify-between items-center py-4 px-2">
         <InlineFilter
           filters={filterRules}
           onFilterChange={handleFilterChange}
         />
+        <Button variant="outline" className="h-12" onClick={handleCopyView}>
+          <ClipboardIcon className="size-4" />
+          Copy View
+        </Button>
       </div>
       <div className="h-full flex flex-col min-w-0 box-border overflow-hidden">
         <DataTable
@@ -126,7 +138,7 @@ export function DashboardContent({ filterString }: DashboardContentProps) {
           isLoading={isLoading}
         />
       </div>
-      <div className="grow-0 shrink-0 py-2 border-t">
+      <div className="grow-0 shrink-0 py-4 border-t">
         <DataTablePagination
           totalResults={productsData?.total ?? 0}
           pageSize={currentPagination.limit}

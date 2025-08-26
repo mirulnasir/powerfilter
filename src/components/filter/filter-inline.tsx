@@ -134,7 +134,7 @@ export function InlineFilter({
   const hasInvalidRules = invalidRulesCount > 0;
 
   return (
-    <div className={`flex gap-x-2 gap-y-1 flex-wrap py-2 px-2 items-center`}>
+    <div className={`flex gap-x-2 gap-y-1 flex-wrap  items-center`}>
       {/* Filter Rules */}
       {filterRules.map((rule) => (
         <FilterRuleComponent
