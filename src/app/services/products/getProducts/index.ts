@@ -1,1 +1,1 @@
-export { initialProductsOptions, useLazyGetProducts } from "./useGetProducts";
+export { initialProductsOptions } from "./useGetProducts";
