@@ -1,22 +1,11 @@
 "use client";
 
 import { SupplierAttribute } from "@/app/types/attribute";
-import { Product } from "@/app/types/product";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import React, { useCallback, useState } from "react";
-import { OPERATORS } from "./constants";
+import React, { useCallback, useState, useId } from "react";
 import { FilterRuleComponent } from "./filter-rule";
-
-/**
- * Filter rule interface for managing individual filter conditions
- */
-export interface FilterRule {
-  id: string;
-  attribute: string;
-  operator: string;
-  value: string;
-}
+import { FilterRule } from "./types";
 
 /**
  * Props for the InlineFilter component
@@ -26,37 +15,34 @@ interface InlineFilterProps {
   onFilterChange: (rules: FilterRule[]) => void;
 }
 
-type ProductFilterKeys = keyof Omit<Product, "id">;
-const productFilterKeys: ProductFilterKeys[] = [
-  "skuId",
-  "updatedAt",
-  "createdAt",
-  "attributes",
-];
-
 /**
  * Inline filter component that starts with a plus button and appends filter rule boxes
- * Each rule box contains attribute, operator, and value inputs
+ * Each rule box contains field selection (base fields + attributes), operator, and value inputs
  */
 export function InlineFilter({
   attributes,
   onFilterChange,
 }: InlineFilterProps) {
   const [filterRules, setFilterRules] = useState<FilterRule[]>([]);
+  const baseId = useId();
+  let ruleCounter = 0;
 
   /**
    * Adds a new filter rule to the end of the list
+   * Starts with empty/unselected state for better UX
    */
   const addFilterRule = useCallback(() => {
     const newRule: FilterRule = {
-      id: crypto.randomUUID(),
-      attribute: attributes[0]?.key || "",
+      id: `${baseId}-rule-${++ruleCounter}`,
+      fieldType: "base", // Default type, but no field selected
+      field: "",
       operator: "$eq",
       value: "",
+      displayName: "",
     };
 
     setFilterRules((prev) => [...prev, newRule]);
-  }, [attributes]);
+  }, [baseId]);
 
   /**
    * Removes a filter rule by ID
@@ -99,8 +85,6 @@ export function InlineFilter({
           key={rule.id}
           rule={rule}
           attributes={attributes}
-          productFilterKeys={productFilterKeys}
-          operators={OPERATORS}
           onUpdate={updateFilterRule}
           onRemove={removeFilterRule}
         />
