@@ -209,7 +209,7 @@ function FilterRuleComponent({
   return (
     <div
       className={cn(
-        "flex items-center gap-x-2 px-3 py-1 h-12 rounded-md border",
+        "flex items-center gap-x-2 px-2 py-1 h-12 rounded-md border",
         isValid
           ? "bg-muted/30 border-border"
           : "bg-muted/10 border-muted-foreground/20 border-dashed",

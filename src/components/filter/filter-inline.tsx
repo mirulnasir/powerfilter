@@ -141,32 +141,34 @@ export function InlineFilter({
         />
       ))}
 
-      {/* Add Filter Button */}
-      <Button
-        variant="outline"
-        onClick={addFilterRule}
-        className="h-12 border-dashed hover:border-solid"
-      >
-        <Plus className="size-4" />
-        Add Filter
-      </Button>
+      <div className="flex gap-x-2 gap-y-1 flex-wrap items-center">
+        {/* Add Filter Button */}
+        <Button
+          variant="outline"
+          onClick={addFilterRule}
+          className="h-12 border-dashed hover:border-solid"
+        >
+          <Plus className="size-4" />
+          Add Filter
+        </Button>
 
-      {totalRulesCount > 0 && (
-        <>
-          <Button onClick={applyFilters} className="h-12" variant={"default"}>
-            Apply Filter
-          </Button>
-          <Button
-            onClick={clearAllFilters}
-            className="h-12"
-            variant={"ghost"}
-            size="sm"
-          >
-            <X className="size-4" />
-            Clear All
-          </Button>
-        </>
-      )}
+        {totalRulesCount > 0 && (
+          <>
+            <Button onClick={applyFilters} className="h-12" variant={"default"}>
+              Apply Filter
+            </Button>
+            <Button
+              onClick={clearAllFilters}
+              className="h-12"
+              variant={"ghost"}
+              size="sm"
+            >
+              <X className="size-4" />
+              Clear All
+            </Button>
+          </>
+        )}
+      </div>
 
       {/* Filter Status */}
       {/* {totalRulesCount > 0 && (
