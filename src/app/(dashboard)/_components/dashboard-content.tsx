@@ -10,6 +10,7 @@ import {
   searchParamsToProductQuery,
   sortFromSearchParams,
   sortToSearchParams,
+  paginationFromSearchParams,
 } from "@/components/filter/search-params";
 import { FilterRule } from "@/components/filter/types";
 import { useQuery } from "@tanstack/react-query";
@@ -37,12 +38,18 @@ export function DashboardContent({
   const sortParam = searchParams.get("sort");
   const currentSort = sortFromSearchParams(sortParam ?? undefined);
 
-  console.log({ filterRules, filterQuery, currentSort });
+  // Get pagination from search params
+  const pageParam = searchParams.get("page");
+  const limitParam = searchParams.get("limit");
+  const currentPagination = paginationFromSearchParams(pageParam, limitParam);
+
+  console.log({ filterRules, filterQuery, currentSort, currentPagination });
 
   const { data: productsData, isLoading } = useQuery(
     initialProductsOptions({
       filter: filterQuery,
       sort: currentSort,
+      pagination: currentPagination,
     }),
   );
 
@@ -82,21 +89,34 @@ export function DashboardContent({
     router.push(`?${newSearchParams.toString()}`);
   };
 
-  const handlePageSizeChange = (pageSize: number) => {
+  /**
+   * Updates the limit parameter in URL and resets to page 1
+   */
+  const handlePageSizeChange = (limit: number) => {
     const newSearchParams = new URLSearchParams(searchParams);
 
-    newSearchParams.set("pageSize", pageSize.toString());
+    newSearchParams.set("limit", limit.toString());
+    newSearchParams.set("page", "1"); // Reset to first page when changing limit
 
     router.push(`?${newSearchParams.toString()}`);
   };
 
-  const handlePageIndexChange = (pageIndex: number) => {
+  /**
+   * Updates the page parameter in URL (1-based)
+   */
+  const handlePageChange = (page: number) => {
     const newSearchParams = new URLSearchParams(searchParams);
 
-    newSearchParams.set("pageIndex", pageIndex.toString());
+    newSearchParams.set("page", page.toString());
 
     router.push(`?${newSearchParams.toString()}`);
   };
+
+  // Calculate current page from pagination data
+  const currentPage =
+    Math.floor(
+      (productsData?.pagination.offset ?? 0) / currentPagination.limit,
+    ) + 1;
   return (
     <div className="flex flex-col h-full">
       <div className="grow-0 shrink-0 ">
@@ -118,10 +138,10 @@ export function DashboardContent({
       <div className="grow-0 shrink-0 py-2 border-t">
         <DataTablePagination
           totalResults={productsData?.total ?? 0}
-          pageSize={productsData?.pagination.limit ?? 0}
-          pageIndex={productsData?.pagination.offset ?? 0}
+          pageSize={currentPagination.limit}
+          currentPage={currentPage}
           onPageSizeChange={handlePageSizeChange}
-          onPageIndexChange={handlePageIndexChange}
+          onPageChange={handlePageChange}
         />
       </div>
     </div>

@@ -16,23 +16,26 @@ import {
 
 interface DataTablePaginationProps {
   totalResults: number;
-  // rows per page
+  /** Items per page */
   pageSize: number;
-  // page index
-  pageIndex: number;
-  // on page size change
+  /** Current page (1-based) */
+  currentPage: number;
+  /** Called when page size changes */
   onPageSizeChange: (pageSize: number) => void;
-  onPageIndexChange: (pageIndex: number) => void;
+  /** Called when page changes (1-based) */
+  onPageChange: (page: number) => void;
 }
 
 export function DataTablePagination({
   totalResults,
   pageSize,
-  pageIndex,
+  currentPage,
   onPageSizeChange,
-  onPageIndexChange,
+  onPageChange,
 }: DataTablePaginationProps) {
-  const totalPages = Math.ceil(totalResults / pageSize);
+  const totalPages = Math.max(1, Math.ceil(totalResults / pageSize));
+  const safePage = Math.max(1, Math.min(currentPage, totalPages));
+
   return (
     <div className="flex items-center justify-between px-2">
       <div className="flex-1 text-sm text-muted-foreground">
@@ -51,23 +54,23 @@ export function DataTablePagination({
               <SelectValue placeholder={pageSize} />
             </SelectTrigger>
             <SelectContent side="top">
-              {[10, 25, 50, 100, 200].map((pageSize) => (
-                <SelectItem key={pageSize} value={`${pageSize}`}>
-                  {pageSize}
+              {[10, 25, 50, 100, 200].map((size) => (
+                <SelectItem key={size} value={`${size}`}>
+                  {size}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
         <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-          Page {pageIndex + 1} of {totalPages}
+          Page {safePage} of {totalPages}
         </div>
         <div className="flex items-center space-x-2">
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => onPageIndexChange(0)}
-            disabled={pageIndex === 0}
+            onClick={() => onPageChange(1)}
+            disabled={currentPage === 1}
           >
             <span className="sr-only">Go to first page</span>
             <ChevronsLeft />
@@ -75,8 +78,8 @@ export function DataTablePagination({
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() => onPageIndexChange(pageIndex - 1)}
-            disabled={pageIndex === 0}
+            onClick={() => onPageChange(currentPage - 1)}
+            disabled={currentPage === 1}
           >
             <span className="sr-only">Go to previous page</span>
             <ChevronLeft />
@@ -84,8 +87,8 @@ export function DataTablePagination({
           <Button
             variant="outline"
             className="h-8 w-8 p-0"
-            onClick={() => onPageIndexChange(pageIndex + 1)}
-            disabled={pageIndex === totalPages - 1}
+            onClick={() => onPageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
           >
             <span className="sr-only">Go to next page</span>
             <ChevronRight />
@@ -93,8 +96,8 @@ export function DataTablePagination({
           <Button
             variant="outline"
             className="hidden h-8 w-8 p-0 lg:flex"
-            onClick={() => onPageIndexChange(totalPages - 1)}
-            disabled={pageIndex === totalPages - 1}
+            onClick={() => onPageChange(totalPages)}
+            disabled={currentPage === totalPages}
           >
             <span className="sr-only">Go to last page</span>
             <ChevronsRight />

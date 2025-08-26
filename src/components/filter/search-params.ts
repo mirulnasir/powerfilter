@@ -3,6 +3,7 @@ import type { ProductQuery } from "@/app/types/query-engine/product";
 import { CleanOperator, isValidCleanOperator } from "./constants";
 import type { FilterRule } from "./types";
 import { InternalQuerySort } from "@/app/types/query-engine/common";
+import type { InternalQueryPagination } from "@/app/types/query-engine/common";
 
 /**
  * Utility class for handling filter rule conversions and URL parameter management
@@ -332,4 +333,35 @@ export function sortToSearchParams(
 ): string | undefined {
   if (!sort) return undefined;
   return `${sort.field}:${sort.order}`;
+}
+
+/**
+ * Converts pagination search parameters to InternalQueryPagination
+ * Uses page (1-based) and limit from URL params
+ */
+export function paginationFromSearchParams(
+  pageParam: string | null,
+  limitParam: string | null,
+  defaultLimit: number = 25,
+): InternalQueryPagination {
+  const page = pageParam ? parseInt(pageParam, 10) : 1;
+  const limit = limitParam ? parseInt(limitParam, 10) : defaultLimit;
+
+  // Convert 1-based page to 0-based offset
+  const offset = Math.max(0, (page - 1) * limit);
+
+  return { offset, limit };
+}
+
+/**
+ * Converts InternalQueryPagination to search parameter values
+ * Returns page (1-based) and limit for URL params
+ */
+export function paginationToSearchParams(pagination: InternalQueryPagination): {
+  page: number;
+  limit: number;
+} {
+  // Convert 0-based offset to 1-based page
+  const page = Math.floor(pagination.offset / pagination.limit) + 1;
+  return { page, limit: pagination.limit };
 }

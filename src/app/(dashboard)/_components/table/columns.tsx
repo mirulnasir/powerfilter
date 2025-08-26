@@ -1,11 +1,15 @@
 "use client";
 
 import { Product, ProductAttribute } from "@/app/types/product";
-import { ColumnDef, Row, Table } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { InternalQuerySort } from "@/app/types/query-engine/common";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ColumnDef, Row, Table } from "@tanstack/react-table";
+import {
+  ArrowDownNarrowWide,
+  ArrowUpDown,
+  ArrowUpWideNarrow,
+} from "lucide-react";
 
 const getAttribute = (attributes: ProductAttribute[], key: string) => {
   return attributes.find((a) => a.key === key);
@@ -17,7 +21,14 @@ type MetaType = {
 };
 
 const AttributeCell = ({ row, name }: { row: Row<Product>; name: string }) => {
-  return <>{getAttribute(row.original.attributes, name)?.value?.toString()}</>;
+  return (
+    <div
+      className="max-w-[200px] truncate"
+      title={getAttribute(row.original.attributes, name)?.value?.toString()}
+    >
+      {getAttribute(row.original.attributes, name)?.value?.toString()}
+    </div>
+  );
 };
 
 const AttributeHeader = ({ name }: { name: string }) => {
@@ -71,13 +82,13 @@ const SortableHeader = ({
 
   const getSortIcon = () => {
     if (!isCurrentSort) {
-      return <ArrowUpDown className="ml-2 h-4 w-4 opacity-50 " />;
+      return <ArrowUpDown className=" h-4 w-4 opacity-50 " />;
     }
 
     return currentOrder === "ASC" ? (
-      <ArrowUp className="ml-2 h-4 w-4 text-teal-600" />
+      <ArrowUpWideNarrow className="   h-4 w-4 text-teal-600" />
     ) : (
-      <ArrowDown className="ml-2 h-4 w-4 text-teal-600" />
+      <ArrowDownNarrowWide className=" h-4 w-4 text-teal-600" />
     );
   };
 
