@@ -3,9 +3,9 @@
 import { SupplierAttribute } from "@/app/types/attribute";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import React, { useCallback, useState, useId } from "react";
+import React, { useCallback, useState } from "react";
 import { FilterRuleComponent } from "./filter-rule";
-import { FilterRule } from "./types";
+import { FilterRule, getValidFilterRules } from "./types";
 
 /**
  * Props for the InlineFilter component
@@ -18,13 +18,13 @@ interface InlineFilterProps {
 /**
  * Inline filter component that starts with a plus button and appends filter rule boxes
  * Each rule box contains field selection (base fields + attributes), operator, and value inputs
+ * Only complete/valid rules are passed to parent component
  */
 export function InlineFilter({
   attributes,
   onFilterChange,
 }: InlineFilterProps) {
   const [filterRules, setFilterRules] = useState<FilterRule[]>([]);
-  const baseId = useId();
   let ruleCounter = 0;
 
   /**
@@ -33,7 +33,7 @@ export function InlineFilter({
    */
   const addFilterRule = useCallback(() => {
     const newRule: FilterRule = {
-      id: `${baseId}-rule-${++ruleCounter}`,
+      id: `rule-${++ruleCounter}`, // baseId is removed, so use a simple counter
       fieldType: "base", // Default type, but no field selected
       field: "",
       operator: "$eq",
@@ -42,7 +42,7 @@ export function InlineFilter({
     };
 
     setFilterRules((prev) => [...prev, newRule]);
-  }, [baseId]);
+  }, []);
 
   /**
    * Removes a filter rule by ID
@@ -67,15 +67,21 @@ export function InlineFilter({
 
   /**
    * Notifies parent component of filter changes whenever rules are updated
+   * Only sends valid/complete rules to prevent filtering with incomplete data
    */
   const notifyFilterChange = useCallback(() => {
-    onFilterChange(filterRules);
+    const validRules = getValidFilterRules(filterRules);
+    onFilterChange(validRules);
   }, [filterRules, onFilterChange]);
 
   // Auto-apply filters when rules change
   React.useEffect(() => {
     notifyFilterChange();
   }, [notifyFilterChange]);
+
+  // Get counts for display
+  const validRulesCount = getValidFilterRules(filterRules).length;
+  const totalRulesCount = filterRules.length;
 
   return (
     <div className={`flex gap-x-2 gap-y-1 flex-wrap`}>
@@ -101,10 +107,11 @@ export function InlineFilter({
       </Button>
 
       {/* Filter Status */}
-      {filterRules.length > 0 && (
+      {totalRulesCount > 0 && (
         <div className="text-sm text-muted-foreground">
-          {filterRules.length} filter rule{filterRules.length !== 1 ? "s" : ""}{" "}
-          applied
+          {validRulesCount} of {totalRulesCount} filter rule
+          {totalRulesCount !== 1 ? "s" : ""}{" "}
+          {validRulesCount === 1 ? "is" : "are"} active
         </div>
       )}
     </div>

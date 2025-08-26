@@ -17,6 +17,14 @@ interface FilterRuleProps {
   onRemove: (ruleId: string) => void;
 }
 
+// Available field options (base fields + attributes option)
+const fieldOptions = [
+  { value: "skuId", label: "SKU ID", type: "base" as const },
+  { value: "updatedAt", label: "Updated At", type: "base" as const },
+  { value: "createdAt", label: "Created At", type: "base" as const },
+  { value: "attributes", label: "Attributes", type: "attribute" as const },
+];
+
 /**
  * Individual filter rule component with conditional attribute selection and auto-focus management
  * - First dropdown: Base fields + "attributes" option
@@ -38,14 +46,6 @@ function FilterRuleComponent({
   const attributeButtonRef = useRef<HTMLButtonElement>(null);
   const operatorButtonRef = useRef<HTMLButtonElement>(null);
   const valueInputRef = useRef<HTMLInputElement>(null);
-
-  // Available field options (base fields + attributes option)
-  const fieldOptions = [
-    { value: "skuId", label: "SKU ID", type: "base" as const },
-    { value: "updatedAt", label: "Updated At", type: "base" as const },
-    { value: "createdAt", label: "Created At", type: "base" as const },
-    { value: "attributes", label: "Attributes", type: "attribute" as const },
-  ];
 
   // Find the currently selected field option
   const selectedFieldOption = fieldOptions.find(
@@ -97,7 +97,7 @@ function FilterRuleComponent({
           field: "attributes",
           displayName: "Attributes",
           value: "",
-          operator: "",
+          operator: "$eq", // Default to equals
         },
         "attribute",
         attributeButtonRef as React.RefObject<HTMLElement>,
@@ -109,9 +109,9 @@ function FilterRuleComponent({
           field: option.value,
           displayName: option.label,
           value: "",
-          operator: "",
+          operator: "$eq", // Default to equals
         },
-        "operator",
+        "operator", // Show operator dropdown (with default selected)
         operatorButtonRef as React.RefObject<HTMLElement>,
       );
     }
@@ -127,9 +127,9 @@ function FilterRuleComponent({
         field: attribute.key,
         displayName: attribute.name,
         value: "",
-        operator: "",
+        operator: "$eq", // Default to equals
       },
-      "operator",
+      "operator", // Show operator dropdown (with default selected)
       operatorButtonRef as React.RefObject<HTMLElement>,
     );
   };
@@ -170,7 +170,13 @@ function FilterRuleComponent({
   };
 
   return (
-    <div className="flex items-center gap-x-2 p-3 bg-muted/30 rounded-md border">
+    <div
+      className={`flex items-center gap-x-2 p-3 rounded-md border ${
+        rule.operator === "$eq"
+          ? "bg-muted/30 border-border"
+          : "bg-muted/10 border-muted-foreground/20 border-dashed"
+      }`}
+    >
       {/* Field Selection Popover */}
       <Popover
         open={openPopover === "field"}
@@ -240,7 +246,7 @@ function FilterRuleComponent({
         </Popover>
       )}
 
-      {/* Operator Popover */}
+      {/* Operator Popover - Shows with default "=" selected */}
       <Popover
         open={openPopover === "operator"}
         onOpenChange={(open) => setOpenPopover(open ? "operator" : null)}

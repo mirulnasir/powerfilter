@@ -1,13 +1,13 @@
 "use client";
 
+import { initialProductsOptions } from "@/app/services/products/getProducts";
 import { SupplierAttribute } from "@/app/types/attribute";
-import { Filter, InlineFilter } from "@/components/filter";
+import { InlineFilter } from "@/components/filter";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { ColumnDef } from "@tanstack/react-table";
 import { Suspense, useState } from "react";
 import { DataTable } from "./table";
 import { columns } from "./table/columns";
-import { ColumnDef } from "@tanstack/react-table";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { initialProductsOptions } from "@/app/services/products/getProducts";
 
 interface DashboardContentProps {
   attributes: SupplierAttribute[];
@@ -27,7 +27,6 @@ export function DashboardContent({ attributes }: DashboardContentProps) {
 
   return (
     <main>
-      <Filter attributes={attributes} onFilterChange={handleFilterChange} />
       <InlineFilter
         attributes={attributes}
         onFilterChange={handleFilterChange}
