@@ -8,6 +8,7 @@
     "start": "next start",
     "prepare": "husky",
     "test": "vitest",
+    "test:e2e": "playwright test",
     "lint": "pnpm run '/^lint:.*/'",
     "lint:eslint": "eslint --cache --cache-location 'node_modules/.cache/eslint/.eslintcache' .",
     "lint:prettier": "prettier --cache --experimental-cli --list-different .",
@@ -54,6 +55,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@playwright/test": "^1.55.0",
     "@tailwindcss/postcss": "^4",
     "@tanstack/eslint-plugin-query": "^5.83.1",
     "@testing-library/dom": "^10.4.1",

@@ -128,7 +128,9 @@ export function InlineFilter({
   const totalRulesCount = filterRules.length;
 
   return (
-    <div className={`flex gap-x-2 gap-y-1 flex-wrap  items-center`}>
+    <div
+      className={`flex gap-x-2 gap-y-1 flex-wrap items-center inline-filter`}
+    >
       {/* Filter Rules */}
       {filterRules.map((rule) => (
         <FilterRuleComponent
@@ -141,12 +143,12 @@ export function InlineFilter({
         />
       ))}
 
-      <div className="flex gap-x-2 gap-y-1 flex-wrap items-center">
+      <div className="flex gap-x-2 gap-y-1 flex-wrap items-center inline-filter__actions">
         {/* Add Filter Button */}
         <Button
           variant="outline"
           onClick={addFilterRule}
-          className="h-12 border-dashed hover:border-solid"
+          className="h-12 border-dashed hover:border-solid inline-filter__add-btn"
         >
           <Plus className="size-4" />
           Add Filter
@@ -154,12 +156,16 @@ export function InlineFilter({
 
         {totalRulesCount > 0 && (
           <>
-            <Button onClick={applyFilters} className="h-12" variant={"default"}>
+            <Button
+              onClick={applyFilters}
+              className="h-12 inline-filter__apply-btn"
+              variant={"default"}
+            >
               Apply Filter
             </Button>
             <Button
               onClick={clearAllFilters}
-              className="h-12"
+              className="h-12 inline-filter__clear-btn"
               variant={"ghost"}
               size="sm"
             >

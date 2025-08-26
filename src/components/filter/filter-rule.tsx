@@ -210,9 +210,11 @@ function FilterRuleComponent({
     <div
       className={cn(
         "flex items-center gap-x-2 px-2 py-1 h-12 rounded-md border",
+        "filter-rule",
+        `filter-rule--id-${rule.id}`,
         isValid
-          ? "bg-muted/30 border-border"
-          : "bg-muted/10 border-muted-foreground/20 border-dashed",
+          ? "bg-muted/30 border-border filter-rule--valid"
+          : "bg-muted/10 border-muted-foreground/20 border-dashed filter-rule--invalid",
       )}
     >
       {/* Field Selection Popover */}
@@ -224,19 +226,21 @@ function FilterRuleComponent({
           <Button
             ref={fieldButtonRef}
             variant="outline"
-            className="w-32 justify-between h-full"
+            className={`w-32 justify-between h-full filter-rule__field-btn filter-rule__field-btn--id-${rule.id}`}
           >
             <span className="truncate">{getFieldDisplayText()}</span>
             <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-32 p-0">
-          <div className="p-1">
+          <div
+            className={`p-1 filter-rule__field-menu filter-rule__field-menu--id-${rule.id}`}
+          >
             {availableFieldOptions.map((option) => (
               <button
                 key={option.value}
                 onClick={() => handleFieldSelect(option)}
-                className="w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none"
+                className={`w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none filter-rule__field-option filter-rule__field-option--${option.value}`}
               >
                 <span className="font-medium">{option.label}</span>
               </button>
@@ -250,7 +254,7 @@ function FilterRuleComponent({
         <AttributeCombobox
           onSelect={handleAttributeSelect}
           placeholder="Search attributes..."
-          className="w-36 h-full"
+          className={`w-36 h-full filter-rule__attribute-select filter-rule__attribute-select--id-${rule.id}`}
           usedAttributeKeys={usedFieldKeysExcludingCurrent}
         />
       )}
@@ -270,7 +274,7 @@ function FilterRuleComponent({
             }}
             onSelect={handleAttributeSelect}
             placeholder="Search attributes..."
-            className="w-36 h-full"
+            className={`w-36 h-full filter-rule__attribute-display filter-rule__attribute-display--id-${rule.id}`}
             usedAttributeKeys={usedFieldKeysExcludingCurrent}
           />
         )}
@@ -284,7 +288,7 @@ function FilterRuleComponent({
           <Button
             ref={operatorButtonRef}
             variant="outline"
-            className="w-32 gap-x-2  justify-start items-center h-full"
+            className={`w-32 gap-x-2 justify-start items-center h-full filter-rule__operator-btn filter-rule__operator-btn--id-${rule.id}`}
           >
             <span className="truncate font-mono w-4">
               {selectedOperator?.symbol || "="}
@@ -296,12 +300,14 @@ function FilterRuleComponent({
           </Button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-56 p-0">
-          <div className="p-1">
+          <div
+            className={`p-1 filter-rule__operator-menu filter-rule__operator-menu--id-${rule.id}`}
+          >
             {OPERATORS.map((op) => (
               <button
                 key={op.value + op.symbol}
                 onClick={() => handleOperatorSelect(op.value)}
-                className="w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none"
+                className={`w-full text-left px-2 py-1.5 text-sm rounded-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none filter-rule__operator-option filter-rule__operator-option--${op.value}`}
               >
                 <div className="flex items-center gap-2">
                   <span className="font-mono w-4">{op.symbol}</span>
@@ -320,7 +326,7 @@ function FilterRuleComponent({
         value={rule.value}
         onChange={(e) => onUpdate(rule.id, { value: e.target.value })}
         onKeyDown={handleValueKeyDown}
-        className="flex-1 h-full"
+        className={`flex-1 h-full filter-rule__value-input filter-rule__value-input--id-${rule.id}`}
       />
 
       {/* Remove Rule Button */}
@@ -328,7 +334,7 @@ function FilterRuleComponent({
         variant="ghost"
         size="icon"
         onClick={() => onRemove(rule.id)}
-        className="shrink-0"
+        className={`shrink-0 filter-rule__remove-btn filter-rule__remove-btn--id-${rule.id}`}
       >
         <X className="size-3" />
       </Button>
