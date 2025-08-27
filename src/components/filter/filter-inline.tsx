@@ -34,7 +34,7 @@ export function InlineFilter({
    */
   const addFilterRule = useCallback(() => {
     const newRule: FilterRule = {
-      id: Date.now().toString(),
+      id: `filter-${filterRules.length}`, // Use array length as ID
       fieldType: "base",
       field: "",
       operator: "eq",
@@ -43,7 +43,7 @@ export function InlineFilter({
     };
 
     setFilterRules((prev) => [...prev, newRule]);
-  }, []);
+  }, [filterRules.length]);
 
   /**
    * Removes a filter rule by ID and cleans up validation state

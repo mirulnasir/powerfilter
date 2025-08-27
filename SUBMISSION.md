@@ -1,5 +1,3 @@
-Your submission details
-
 ## DOCS LINKS
 
 - [01 - Data Check](./docs/01-data-check.md)

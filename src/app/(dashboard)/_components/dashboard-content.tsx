@@ -7,10 +7,10 @@ import { InlineFilter } from "@/components/filter";
 import {
   filtersFromSearchParams,
   filtersToSearchParams,
+  paginationFromSearchParams,
   searchParamsToProductQuery,
   sortFromSearchParams,
   sortToSearchParams,
-  paginationFromSearchParams,
 } from "@/components/filter/search-params";
 import { FilterRule } from "@/components/filter/types";
 import { useQuery } from "@tanstack/react-query";
@@ -19,8 +19,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { DataTable } from "./table";
 import { columns } from "./table/columns";
 import { DataTablePagination } from "./table/data-table-pagination";
-import { Button } from "@/components/ui/button";
-import { ClipboardIcon } from "lucide-react";
 
 interface DashboardContentProps {
   filterString: string | string[];
@@ -112,23 +110,13 @@ export function DashboardContent({ filterString }: DashboardContentProps) {
       (productsData?.pagination.offset ?? 0) / currentPagination.limit,
     ) + 1;
 
-  const handleCopyView = () => {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url);
-  };
-
   return (
     <div className="flex flex-col h-full">
-      {/* <DatePicker /> */}
       <div className="grow-0 shrink-0 flex gap-2 justify-between items-center py-4 px-2">
         <InlineFilter
           filters={filterRules}
           onFilterChange={handleFilterChange}
         />
-        <Button variant="outline" className="h-12" onClick={handleCopyView}>
-          <ClipboardIcon className="size-4" />
-          Copy View
-        </Button>
       </div>
       <div className="h-full flex flex-col min-w-0 box-border overflow-hidden">
         <DataTable

@@ -1,3 +1,4 @@
+"use client";
 import { ChevronDown, X } from "lucide-react";
 import { Button } from "../ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
@@ -211,7 +212,6 @@ function FilterRuleComponent({
       className={cn(
         "flex items-center gap-x-2 px-2 py-1 h-12 rounded-md border",
         "filter-rule",
-        `filter-rule--id-${rule.id}`,
         isValid
           ? "bg-muted/30 border-border filter-rule--valid"
           : "bg-muted/10 border-muted-foreground/20 border-dashed filter-rule--invalid",
@@ -226,7 +226,7 @@ function FilterRuleComponent({
           <Button
             ref={fieldButtonRef}
             variant="outline"
-            className={`w-32 justify-between h-full filter-rule__field-btn filter-rule__field-btn--id-${rule.id}`}
+            className={`w-32 justify-between h-full filter-rule__field-btn filter-rule__field-btn `}
           >
             <span className="truncate">{getFieldDisplayText()}</span>
             <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
@@ -234,7 +234,7 @@ function FilterRuleComponent({
         </PopoverTrigger>
         <PopoverContent align="start" className="w-32 p-0">
           <div
-            className={`p-1 filter-rule__field-menu filter-rule__field-menu--id-${rule.id}`}
+            className={`p-1 filter-rule__field-menu filter-rule__field-menu`}
           >
             {availableFieldOptions.map((option) => (
               <button
@@ -254,7 +254,7 @@ function FilterRuleComponent({
         <AttributeCombobox
           onSelect={handleAttributeSelect}
           placeholder="Search attributes..."
-          className={`w-36 h-full filter-rule__attribute-select filter-rule__attribute-select--id-${rule.id}`}
+          className={`w-36 h-full filter-rule__attribute-select filter-rule__attribute-select `}
           usedAttributeKeys={usedFieldKeysExcludingCurrent}
         />
       )}
@@ -274,7 +274,7 @@ function FilterRuleComponent({
             }}
             onSelect={handleAttributeSelect}
             placeholder="Search attributes..."
-            className={`w-36 h-full filter-rule__attribute-display filter-rule__attribute-display--id-${rule.id}`}
+            className={`w-36 h-full filter-rule__attribute-display filter-rule__attribute-display `}
             usedAttributeKeys={usedFieldKeysExcludingCurrent}
           />
         )}
@@ -288,7 +288,7 @@ function FilterRuleComponent({
           <Button
             ref={operatorButtonRef}
             variant="outline"
-            className={`w-32 gap-x-2 justify-start items-center h-full filter-rule__operator-btn filter-rule__operator-btn--id-${rule.id}`}
+            className={`w-32 gap-x-2 justify-start items-center h-full filter-rule__operator-btn filter-rule__operator-btn `}
           >
             <span className="truncate font-mono w-4">
               {selectedOperator?.symbol || "="}
@@ -301,7 +301,7 @@ function FilterRuleComponent({
         </PopoverTrigger>
         <PopoverContent align="start" className="w-56 p-0">
           <div
-            className={`p-1 filter-rule__operator-menu filter-rule__operator-menu--id-${rule.id}`}
+            className={`p-1 filter-rule__operator-menu filter-rule__operator-menu `}
           >
             {OPERATORS.map((op) => (
               <button
@@ -326,7 +326,7 @@ function FilterRuleComponent({
         value={rule.value}
         onChange={(e) => onUpdate(rule.id, { value: e.target.value })}
         onKeyDown={handleValueKeyDown}
-        className={`flex-1 h-full filter-rule__value-input filter-rule__value-input--id-${rule.id}`}
+        className={`flex-1 h-full filter-rule__value-input filter-rule__value-input `}
       />
 
       {/* Remove Rule Button */}
@@ -334,7 +334,7 @@ function FilterRuleComponent({
         variant="ghost"
         size="icon"
         onClick={() => onRemove(rule.id)}
-        className={`shrink-0 filter-rule__remove-btn filter-rule__remove-btn--id-${rule.id}`}
+        className={`shrink-0 filter-rule__remove-btn filter-rule__remove-btn `}
       >
         <X className="size-3" />
       </Button>
