@@ -119,6 +119,7 @@ export function DashboardContent({ filterString }: DashboardContentProps) {
 
   return (
     <div className="flex flex-col h-full">
+      {/* <DatePicker /> */}
       <div className="grow-0 shrink-0 flex gap-2 justify-between items-center py-4 px-2">
         <InlineFilter
           filters={filterRules}
