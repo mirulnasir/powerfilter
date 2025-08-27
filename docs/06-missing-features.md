@@ -3,6 +3,8 @@
 ### Features
 
 - [ ] Detailed filter attribute
+- [ ] Some of filtering requires specific field type, e.g. date, number, etc.
+- [ ] Better tooltip
 
 ### Tools
 
