@@ -10,3 +10,8 @@
 
 - ![Lighthouse Report](obs-2.png)
 - not really a good report, but it's a good starting point.
+
+### Analytics
+
+- User tracking can be done with analytics util, we can use this module so that we can use multiple different analytics providers.
+- And further tracking can be done with `useAnalytics` hook.

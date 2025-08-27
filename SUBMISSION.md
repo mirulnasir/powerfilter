@@ -6,3 +6,26 @@
 - [04 - Architecture Dependencies](./docs/04-architecture-dependencies.md)
 - [05 - Observability](./docs/05-observability.md)
 - [06 - Missing Features](./docs/06-missing-features.md)
+
+## How To Run
+
+Project requirements
+
+- Node LTS v22+
+- pnpm 10+
+
+```bash
+# install dependencies
+pnpm i
+# build the project
+pnpm build
+# start the project
+pnpm start
+```
+
+## How To Test
+
+```bash
+# run the tests
+pnpm test
+```
