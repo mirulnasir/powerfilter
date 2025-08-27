@@ -15,3 +15,4 @@
 
 - User tracking can be done with analytics util, we can use this module so that we can use multiple different analytics providers.
 - And further tracking can be done with `useAnalytics` hook.
+- further reading : https://www.npmjs.com/package/use-analytics
