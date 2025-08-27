@@ -10,6 +10,7 @@ import {
   ArrowUpDown,
   ArrowUpWideNarrow,
 } from "lucide-react";
+import dayjs from "dayjs";
 
 const getAttribute = (attributes: ProductAttribute[], key: string) => {
   return attributes.find((a) => a.key === key);
@@ -38,6 +39,22 @@ const AttributeHeader = ({ name }: { name: string }) => {
         attr
       </div>
       <div className="">{name}</div>
+    </div>
+  );
+};
+
+/**
+ * Date cell component that displays formatted timestamp with original epoch underneath
+ * Uses dayjs to parse epoch timestamps and format them in a human-readable format
+ * @param timestamp - Epoch timestamp in milliseconds
+ */
+const DateCell = ({ timestamp }: { timestamp: number }) => {
+  const formattedDate = dayjs(timestamp).format("DD/MM/YYYY hh:mm:ss A");
+
+  return (
+    <div className="flex flex-col">
+      <div className="text-sm">{formattedDate}</div>
+      <div className="text-xs text-muted-foreground">{timestamp}</div>
     </div>
   );
 };
@@ -123,6 +140,7 @@ export const columns: ColumnDef<Product>[] = [
         Updated At
       </SortableHeader>
     ),
+    cell: ({ row }) => <DateCell timestamp={row.original.updatedAt} />,
   },
   {
     accessorKey: "createdAt",
@@ -131,6 +149,7 @@ export const columns: ColumnDef<Product>[] = [
         Created At
       </SortableHeader>
     ),
+    cell: ({ row }) => <DateCell timestamp={row.original.createdAt} />,
   },
   {
     accessorKey: "Name",
